@@ -94,8 +94,6 @@ void AfvBridge::ToggleFrequency(double frequency, bool receive, bool transmit)
             if (channel.GetIsTextTransmitOn() != transmit) {
                 channel.ToggleTextTransmit();
             }
-
-            return;
         }
 
         channel = this->GroundToArChannelSelectNext(channel);
