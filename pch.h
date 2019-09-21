@@ -11,6 +11,12 @@
 #include "framework.h"
 #include "EuroScopePlugIn.h"
 #include "constants.h"
+#include <string>
+#include <mutex>
+#include <queue>
+#include <vector>
+#include <sstream>
 #include <Windows.h>
+#include <regex>
 
 #endif //PCH_H
