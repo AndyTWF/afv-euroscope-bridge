@@ -169,12 +169,14 @@
     <ClInclude Include="constants.h" />
     <ClInclude Include="EuroScopePlugIn.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="HiddenWindow.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="afv-euroscope-bridge.cpp" />
     <ClCompile Include="AfvBridge.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="HiddenWindow.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

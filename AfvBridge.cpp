@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AfvBridge.h"
+#include "HiddenWindow.h"
 
 
 AfvBridge::AfvBridge(void)
@@ -11,7 +12,34 @@ AfvBridge::AfvBridge(void)
         PLUGIN_COPYRIGHT
     )
 {
+    RegisterClass(&this->windowClass);
 
+    HWND window = CreateWindow(
+        L"AfvBridgeHiddenWindowClass",
+        L"AfvBridgeHiddenWindow",
+        NULL,
+        0,
+        0,
+        0,
+        0,
+        GetActiveWindow(),
+        NULL,
+        GetModuleHandle(NULL),
+        reinterpret_cast<LPVOID>(this)
+    );
+
+    if (GetLastError() != S_OK) {
+        this->DisplayUserMessage(
+            "AFV_BRIDGE",
+            "AFV_BRIDGE",
+            "Unable to open communications for AFV Bridge",
+            true,
+            true,
+            true,
+            true,
+            true
+        );
+    }
 }
 
 /*
@@ -19,8 +47,6 @@ AfvBridge::AfvBridge(void)
 */
 void AfvBridge::OnTimer(int counter)
 {
-    this->messages.push("118.500:true:true");
-
     std::lock_guard<std::mutex> lock(this->messageLock);
 
     if (this->messages.size() == 0) {
@@ -31,6 +57,45 @@ void AfvBridge::OnTimer(int counter)
         this->ProcessMessage(this->messages.front());
         this->messages.pop();
     }
+}
+
+#ifdef _DEBUG
+bool AfvBridge::OnCompileCommand(const char* command)
+{
+    std::string commandString(command);
+
+    // Check message
+    if (commandString.substr(0, 5) != ".afv ") {
+        return false;
+    }
+
+    // Create copy data
+    std::string message = commandString.substr(5);
+    std::replace(message.begin(), message.end(), ' ', ':');
+
+    std::wstring wideMessage = this->converter.from_bytes(message);
+
+    COPYDATASTRUCT cds;
+    cds.dwData = 666;
+    cds.cbData = message.size() + 1;
+    cds.lpData = (PVOID) wideMessage.c_str();
+
+    // Find the hidden window
+    HWND window = FindWindowEx(NULL, NULL, this->windowClass.lpszClassName, NULL);
+    if (window == NULL) {
+        return true;
+    }
+
+    // Send the data
+    SendMessage(window, WM_COPYDATA, reinterpret_cast<WPARAM>(window), reinterpret_cast<LPARAM>(&cds));
+    return true;
+}
+#endif // _DEBUG
+
+void AfvBridge::AddMessageToQueue(std::string message)
+{
+    std::lock_guard<std::mutex> lock(this->messageLock);
+    this->messages.push(message);
 }
 
 void AfvBridge::ProcessMessage(std::string message)

@@ -18,5 +18,9 @@
 #include <sstream>
 #include <Windows.h>
 #include <regex>
+#include <functional>
+#include <thread>
+#include <locale>
+#include <codecvt>
 
 #endif //PCH_H
