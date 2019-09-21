@@ -1,0 +1,2 @@
+#define AFVEUROSCOPEBRIDGE_API __declspec(dllexport)
+#define AFVEUROSCOPEBRIDGE_API __declspec(dllimport)
