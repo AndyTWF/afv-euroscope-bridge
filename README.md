@@ -1,7 +1,7 @@
 # afv-euroscope-bridge
 Provides a bridge between the Audio for Vatsim standalone client and EuroScope 3.2.
 
-## What does it do?
+## What Does It Do?
 
 The code compiles into a EuroScope plugin DLL that can receive messages from the Audio for Vatsim standalone client.
 These messages tell the plugin the frequencies on which it should transmit and receive text messages.
@@ -27,7 +27,7 @@ should be sent to windows of the class `AfvBridgeHiddenWindowClass`.
 
 ## Sending Test Messages
 
-When the plugin is compiled in debug mode, test messages may be sent using EuroScopes inbuilt
+When the plugin is compiled in debug mode, test messages may be sent using EuroScope's inbuilt
 command functionality. The command is of the following format:
 
 ```
