@@ -80,12 +80,10 @@ bool AfvBridge::OnCompileCommand(const char* command)
     std::string message = commandString.substr(5);
     std::replace(message.begin(), message.end(), ' ', ':');
 
-    std::wstring wideMessage = this->converter.from_bytes(message);
-
     COPYDATASTRUCT cds;
     cds.dwData = 666;
     cds.cbData = message.size() + 1;
-    cds.lpData = (PVOID) wideMessage.c_str();
+    cds.lpData = (PVOID) message.c_str();
 
     // Find the hidden window
     HWND window = FindWindowEx(NULL, NULL, this->windowClass.lpszClassName, NULL);
@@ -99,6 +97,9 @@ bool AfvBridge::OnCompileCommand(const char* command)
 }
 #endif // _DEBUG
 
+/*
+    Takes a message, adds it to the queue
+*/
 void AfvBridge::AddMessageToQueue(std::string message)
 {
     std::lock_guard<std::mutex> lock(this->messageLock);
@@ -137,12 +138,12 @@ void AfvBridge::ProcessMessage(std::string message)
 
 bool AfvBridge::ValidBoolean(std::string boolean) const
 {
-    return boolean == "true" || boolean == "false";
+    return boolean == "True" || boolean == "False";
 }
 
 bool AfvBridge::ConvertBoolean(std::string boolean) const
 {
-    return boolean == "true";
+    return boolean == "True";
 }
 
 /*

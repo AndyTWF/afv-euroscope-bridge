@@ -4,8 +4,6 @@
 
 AfvBridge * bridge = nullptr;
 
-std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stringConvertor;
-
 LRESULT CALLBACK HiddenWindow(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg) {
@@ -18,7 +16,7 @@ LRESULT CALLBACK HiddenWindow(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             COPYDATASTRUCT * data = reinterpret_cast<COPYDATASTRUCT *>(lParam);
 
             if (data->dwData == 666 && bridge != nullptr) {
-                bridge->AddMessageToQueue(stringConvertor.to_bytes(reinterpret_cast<LPCTSTR>(data->lpData)));
+                bridge->AddMessageToQueue(reinterpret_cast<const char*>(data->lpData));
             }
         }
     }

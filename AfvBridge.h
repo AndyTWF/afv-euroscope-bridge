@@ -45,7 +45,4 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
            NULL,
            L"AfvBridgeHiddenWindowClass"
         };
-
-        // Converts string messages to the wide type needed by windows.
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 };
