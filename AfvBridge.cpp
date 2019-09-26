@@ -22,7 +22,7 @@ AfvBridge::AfvBridge(void)
         0,
         0,
         0,
-        GetActiveWindow(),
+        NULL,
         NULL,
         GetModuleHandle(NULL),
         reinterpret_cast<LPVOID>(this)
