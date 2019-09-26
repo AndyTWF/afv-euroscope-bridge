@@ -14,7 +14,7 @@ AfvBridge::AfvBridge(void)
 {
     RegisterClass(&this->windowClass);
 
-    HWND window = CreateWindow(
+    this->hiddenWindow = CreateWindow(
         L"AfvBridgeHiddenWindowClass",
         L"AfvBridgeHiddenWindow",
         NULL,
@@ -39,6 +39,13 @@ AfvBridge::AfvBridge(void)
             true,
             true
         );
+    }
+}
+
+AfvBridge::~AfvBridge(void)
+{
+    if (this->hiddenWindow != NULL) {
+        DestroyWindow(this->hiddenWindow);
     }
 }
 

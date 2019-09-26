@@ -5,6 +5,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
 {
     public:
         AfvBridge(void);
+        ~AfvBridge(void);
         void AddMessageToQueue(std::string message);
         void OnTimer(int counter) override;
 
@@ -27,6 +28,9 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
 
         // Allowed deviation in frequencies due to FP rounding
         const double frequencyDeviation = 0.0001;
+
+        // The window handle so we can kill it
+        HWND hiddenWindow = NULL;
 
         // Class for our window
         WNDCLASS windowClass = {
