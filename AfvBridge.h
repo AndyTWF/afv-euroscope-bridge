@@ -15,6 +15,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
 
     private:
 
+        void CheckAtisFrequencies(void);
         void ProcessMessage(std::string message);
         bool ValidBoolean(std::string boolean) const;
         bool ConvertBoolean(std::string boolean) const;
@@ -28,6 +29,9 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
 
         // Allowed deviation in frequencies due to FP rounding
         const double frequencyDeviation = 0.0001;
+
+        // The currently selected ATIS channel
+        EuroScopePlugIn::CGrountToAirChannel currentAtisChannel;
 
         // The window handle so we can kill it
         HWND hiddenWindow = NULL;
