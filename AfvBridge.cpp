@@ -63,7 +63,9 @@ void AfvBridge::OnTimer(int counter)
     }
 
     // Make sure that ATIS frequencies have TXT RCV/XMT ticked
-    this->CheckAtisFrequencies();
+    if (counter % 2 == 0) {
+        this->CheckAtisFrequencies();
+    }
 }
 
 #ifdef _DEBUG
@@ -112,9 +114,19 @@ void AfvBridge::AddMessageToQueue(std::string message)
 */
 void AfvBridge::CheckAtisFrequencies(void)
 {
-    // If the ATIS channel hasn't changed, don't do anything.
-    if (this->currentAtisChannel.IsValid() && this->currentAtisChannel.GetIsAtis()) {
-        std::string atisName = this->currentAtisChannel.GetName();
+    // If the ATIS channel hasn't changed, check everythings ticked and do no more.
+    if (
+        this->currentAtisChannel.IsValid() &&
+        this->currentAtisChannel.GetIsAtis()
+    ) {
+        if (!this->currentAtisChannel.GetIsTextReceiveOn()) {
+            this->currentAtisChannel.ToggleTextReceive();
+        }
+
+        if (!this->currentAtisChannel.GetIsTextTransmitOn()) {
+            this->currentAtisChannel.ToggleTextTransmit();
+        }
+
         return;
     }
 
@@ -140,8 +152,6 @@ void AfvBridge::CheckAtisFrequencies(void)
 
         // If we find the atis, turn on text
         if (selected.GetIsAtis()) {
-
-            std::string name = selected.GetName();
             if (!selected.GetIsTextReceiveOn()) {
                 selected.ToggleTextReceive();
             }
