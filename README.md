@@ -42,7 +42,3 @@ Where:
 - FREQ is a 6 digit frequency
 - RCV is a boolean (true or false) for whether text receive should be turned on.
 - XMT is a boolean (true or false) for whether text transmit should be turned on.
-
-## Automatic Monitoring of ATIS Frequencies
-
-The plugin regularly checks the status of all defined frequencies. If a frequency has been marked as an active ATIS, the plugin will automatically enable the sending and receiving of text on that frequency.

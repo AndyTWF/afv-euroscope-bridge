@@ -61,11 +61,6 @@ void AfvBridge::OnTimer(int counter)
         this->ProcessMessage(this->messages.front());
         this->messages.pop();
     }
-
-    // Make sure that ATIS frequencies have TXT RCV/XMT ticked
-    if (counter % 2 == 0) {
-        this->CheckAtisFrequencies();
-    }
 }
 
 #ifdef _DEBUG
@@ -106,66 +101,6 @@ void AfvBridge::AddMessageToQueue(std::string message)
 {
     std::lock_guard<std::mutex> lock(this->messageLock);
     this->messages.push(message);
-}
-
-/*
-    Checks for any frequencies marked active as an ATIS and activates
-    TXT RCV/XMT.
-*/
-void AfvBridge::CheckAtisFrequencies(void)
-{
-    // If the ATIS channel hasn't changed, check everythings ticked and do no more.
-    if (
-        this->currentAtisChannel.IsValid() &&
-        this->currentAtisChannel.GetIsAtis()
-    ) {
-        if (!this->currentAtisChannel.GetIsTextReceiveOn()) {
-            this->currentAtisChannel.ToggleTextReceive();
-        }
-
-        if (!this->currentAtisChannel.GetIsTextTransmitOn()) {
-            this->currentAtisChannel.ToggleTextTransmit();
-        }
-
-        return;
-    }
-
-    // If we had an ATIS previously, but that's changed, clear it!
-    if (this->currentAtisChannel.IsValid() && !this->currentAtisChannel.GetIsAtis()) {
-        if (this->currentAtisChannel.GetIsTextReceiveOn()) {
-            this->currentAtisChannel.ToggleTextReceive();
-        }
-
-        if (this->currentAtisChannel.GetIsTextTransmitOn()) {
-            this->currentAtisChannel.ToggleTextTransmit();
-        }
-
-        this->currentAtisChannel = EuroScopePlugIn::CGrountToAirChannel();
-    }
-
-    // Loop the channels and see if we have an ATIS.
-    EuroScopePlugIn::CGrountToAirChannel selected = this->GroundToArChannelSelectFirst();
-    while (true) {
-        if (!selected.IsValid()) {
-            return;
-        }
-
-        // If we find the atis, turn on text
-        if (selected.GetIsAtis()) {
-            if (!selected.GetIsTextReceiveOn()) {
-                selected.ToggleTextReceive();
-            }
-
-            if (!selected.GetIsTextTransmitOn()) {
-                selected.ToggleTextTransmit();
-            }
-
-            this->currentAtisChannel = selected;
-            return;
-        }
-
-        selected = this->GroundToArChannelSelectNext(selected);
-    }
 }
 
 void AfvBridge::ProcessMessage(std::string message)
