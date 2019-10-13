@@ -155,7 +155,7 @@ void AfvBridge::ToggleFrequency(double frequency, bool receive, bool transmit)
             return;
         }
 
-        if (std::abs(channel.GetFrequency() - frequency) < this->frequencyDeviation) {
+        if (std::abs(channel.GetFrequency() - frequency) < this->frequencyDeviation && !this->IsAtisChannel(channel.GetVoiceChannel())) {
 
             if (channel.GetIsTextReceiveOn() != receive) {
                 channel.ToggleTextReceive();
@@ -168,4 +168,15 @@ void AfvBridge::ToggleFrequency(double frequency, bool receive, bool transmit)
 
         channel = this->GroundToArChannelSelectNext(channel);
     }
+}
+
+/*
+    Checks if the channel is an ATIS channel.
+*/
+bool AfvBridge::IsAtisChannel(std::string channel) const
+{
+    std::transform(channel.begin(), channel.end(), channel.begin(),
+        [](unsigned char c) { return std::tolower(c); });
+
+    return channel.find("_atis") != std::string::npos;
 }

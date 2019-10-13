@@ -20,6 +20,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         bool ValidBoolean(std::string boolean) const;
         bool ConvertBoolean(std::string boolean) const;
         void ToggleFrequency(double frequency, bool receive, bool transmit);
+        bool IsAtisChannel(std::string channel) const;
 
         // Lock for the message queue
         std::mutex messageLock;
