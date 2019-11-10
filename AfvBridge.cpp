@@ -148,14 +148,21 @@ bool AfvBridge::ConvertBoolean(std::string boolean) const
 */
 void AfvBridge::ToggleFrequency(double frequency, bool receive, bool transmit)
 {
-    EuroScopePlugIn::CGrountToAirChannel channel = this->GroundToArChannelSelectFirst();
+    // If the frequency is our primary frequency, ignore it - ES automatically sets text RCV/XMT when
+    // primary is selected.
+    EuroScopePlugIn::CGrountToAirChannel primaryChannel = this->GetPrimaryFrequency();
+    if (primaryChannel.IsValid() && this->IsFrequencyMatch(frequency, primaryChannel)) {
+        return;
+    }
 
+    // Otherwise, loop the frequencies and toggle the first one.
+    EuroScopePlugIn::CGrountToAirChannel channel = this->GroundToArChannelSelectFirst();
     while (true) {
         if (!channel.IsValid()) {
             return;
         }
 
-        if (std::abs(channel.GetFrequency() - frequency) < this->frequencyDeviation && !this->IsAtisChannel(channel.GetVoiceChannel())) {
+        if (this->IsFrequencyMatch(frequency, channel) && !this->IsAtisChannel(channel.GetVoiceChannel())) {
 
             if (channel.GetIsTextReceiveOn() != receive) {
                 channel.ToggleTextReceive();
@@ -164,10 +171,21 @@ void AfvBridge::ToggleFrequency(double frequency, bool receive, bool transmit)
             if (channel.GetIsTextTransmitOn() != transmit) {
                 channel.ToggleTextTransmit();
             }
+
+            return;
         }
 
         channel = this->GroundToArChannelSelectNext(channel);
     }
+}
+
+/*
+    Returns true if the given channel has a frequency within a reasonable deviation
+    of the target frequency.
+*/
+bool AfvBridge::IsFrequencyMatch(double targetFrequency, EuroScopePlugIn::CGrountToAirChannel channel)
+{
+    return std::abs(channel.GetFrequency() - targetFrequency) < this->frequencyDeviation;
 }
 
 /*
@@ -179,4 +197,25 @@ bool AfvBridge::IsAtisChannel(std::string channel) const
         [](unsigned char c) { return std::tolower(c); });
 
     return channel.find("_atis") != std::string::npos;
+}
+
+/*
+    Find the channel which is the primary frequency.
+*/
+EuroScopePlugIn::CGrountToAirChannel AfvBridge::GetPrimaryFrequency(void)
+{
+    EuroScopePlugIn::CGrountToAirChannel channel = this->GroundToArChannelSelectFirst();
+    while (true) {
+        if (!channel.IsValid()) {
+            break;
+        }
+
+        if (channel.GetIsPrimary()) {
+            return channel;
+        }
+
+        channel = this->GroundToArChannelSelectNext(channel);
+    }
+
+    return EuroScopePlugIn::CGrountToAirChannel();
 }

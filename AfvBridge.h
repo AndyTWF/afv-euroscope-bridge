@@ -15,12 +15,13 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
 
     private:
 
-        void CheckAtisFrequencies(void);
         void ProcessMessage(std::string message);
         bool ValidBoolean(std::string boolean) const;
         bool ConvertBoolean(std::string boolean) const;
         void ToggleFrequency(double frequency, bool receive, bool transmit);
+        bool IsFrequencyMatch(double targetFrequency, EuroScopePlugIn::CGrountToAirChannel channel);
         bool IsAtisChannel(std::string channel) const;
+        EuroScopePlugIn::CGrountToAirChannel GetPrimaryFrequency(void);
 
         // Lock for the message queue
         std::mutex messageLock;
