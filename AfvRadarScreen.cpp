@@ -4,19 +4,15 @@
 
 AfvRadarScreen::AfvRadarScreen()
 {
-    this->windowRect = {
-        this->startCoordinate,
-        this->startCoordinate,
-        this->startCoordinate + this->windowWidth,
-        this->startCoordinate + this->windowHeight,
-    };
-
+    this->Move(this->startCoordinate, this->startCoordinate);
     this->backgroundBrush = CreateSolidBrush(RGB(0, 0, 0));
+    this->txRxActiveBrush = CreateSolidBrush(RGB(234, 173, 92));
 }
 
 AfvRadarScreen::~AfvRadarScreen()
 {
     DeleteObject(this->backgroundBrush);
+    DeleteObject(this->txRxActiveBrush);
 }
 
 void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
@@ -30,6 +26,38 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     FillRect(hdc, &this->windowRect, this->backgroundBrush);
     this->AddScreenObject(1, "afvWindow", this->windowRect, true, "");
 
+    // TX
+    FillRect(hdc, &this->txRect, this->txRxActiveBrush);
+    DrawText(hdc, L"TX", 2, &this->txRect, DT_VCENTER | DT_CENTER);
+
+    // RX
+    FillRect(hdc, &this->rxRect, this->txRxActiveBrush);
+    DrawText(hdc, L"RX", 2, &this->rxRect, DT_VCENTER | DT_CENTER);
+
+}
+
+void AfvRadarScreen::Move(int xPos, int yPos)
+{
+    this->windowRect = {
+        xPos,
+        yPos,
+        xPos + this->windowWidth,
+        yPos + this->windowHeight,
+    };
+
+    this->txRect = {
+        xPos + this->txOffsetX,
+        yPos + this->txRxOffsetY,
+        xPos + this->txOffsetX + this->txRxWidth,
+        yPos + this->txRxOffsetY + this->txRxHeight,
+    };
+
+    this->rxRect = {
+        xPos + this->txOffsetX + this->txRxWidth + this->txRxGap,
+        yPos + this->txRxOffsetY,
+        xPos + this->txOffsetX + this->txRxWidth + this->txRxGap + this->txRxWidth,
+        yPos + this->txRxOffsetY + this->txRxHeight,
+    };
 }
 
 void AfvRadarScreen::OnAsrContentToBeClosed(void)
@@ -39,5 +67,5 @@ void AfvRadarScreen::OnAsrContentToBeClosed(void)
 
 void AfvRadarScreen::OnMoveScreenObject(int ObjectType, const char* sObjectId, POINT Pt, RECT Area, bool Released)
 {
-    this->windowRect = Area;
+    this->Move(Area.left, Area.top);
 }

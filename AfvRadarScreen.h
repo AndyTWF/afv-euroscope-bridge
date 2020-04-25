@@ -19,15 +19,29 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
 
     private:
 
+        void Move(int xPos, int yPos);
+
         bool shouldRender = true;
+
+        // Moveable things
         RECT windowRect;
+        RECT txRect;
+        RECT rxRect;
 
         // Fixed coordinates
         const int startCoordinate = 100;
-        const int windowWidth = 100;
+        const int windowWidth = 105;
         const int windowHeight = 100;
+
+        const int txRxWidth = 40;
+        const int txRxHeight = 15;
+        const int txRxGap = 15;
+        const int txOffsetX = 5;
+        const int txRxOffsetY = 15;
+
 
         // Brushes
         HBRUSH backgroundBrush;
+        HBRUSH txRxActiveBrush;
 };
 
