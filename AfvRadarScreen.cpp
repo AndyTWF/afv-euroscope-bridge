@@ -40,6 +40,9 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     FillRect(hdc, &this->rxRect, this->txRxActiveBrush);
     DrawText(hdc, L"RX", 2, &this->rxRect, DT_VCENTER | DT_CENTER);
 
+    // Last Received
+    std::wstring lastReceived = L"Last: BAW47C";
+    DrawText(hdc, lastReceived.c_str(), lastReceived.size(), &this->lastReceivedRect, DT_VCENTER | DT_CENTER | DT_WORDBREAK);
 }
 
 void AfvRadarScreen::Move(int xPos, int yPos)
@@ -59,17 +62,24 @@ void AfvRadarScreen::Move(int xPos, int yPos)
     };
 
     this->txRect = {
-        xPos + this->txOffsetX,
+        xPos + this->margin,
         yPos + this->headerHeight + this->txRxOffsetY,
-        xPos + this->txOffsetX + this->txRxWidth,
+        xPos + this->margin + this->txRxWidth,
         yPos + this->headerHeight + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->rxRect = {
-        xPos + this->txOffsetX + this->txRxWidth + this->txRxGap,
+        xPos + this->margin + this->txRxWidth + this->txRxGap,
         yPos + this->headerHeight + this->txRxOffsetY,
-        xPos + this->txOffsetX + this->txRxWidth + this->txRxGap + this->txRxWidth,
+        xPos + this->margin + this->txRxWidth + this->txRxGap + this->txRxWidth,
         yPos + this->headerHeight + this->txRxOffsetY + this->txRxHeight,
+    };
+
+    this->lastReceivedRect = {
+        xPos + this->margin,
+        this->txRect.bottom + this->lastReceivedOffset,
+        this->rxRect.right,
+        this->txRect.bottom + this->lastReceivedOffset + this->lastReceivedHeight
     };
 }
 
