@@ -169,10 +169,6 @@ void AfvRadarScreen::Move(int xPos, int yPos)
 
 void AfvRadarScreen::OnAsrContentLoaded(bool loaded)
 {
-    if (!loaded) {
-        return;
-    }
-
     // Visibility
     if (this->GetDataFromAsr(this->settingKeyVisible.c_str()) != NULL) {
         this->shouldRender = strcmp(this->GetDataFromAsr(this->settingKeyVisible.c_str()), "0") == 0 ? false : true;
