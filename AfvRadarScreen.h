@@ -5,9 +5,17 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
     public:
         AfvRadarScreen();
         ~AfvRadarScreen();
-        void OnRefresh(HDC hdc, int phase) override;
+
         // Inherited via CRadarScreen
-        virtual void OnAsrContentToBeClosed(void) override;
+        void OnAsrContentToBeClosed(void) override;
+        void OnMoveScreenObject(
+            int ObjectType,
+            const char* sObjectId,
+            POINT Pt,
+            RECT Area,
+            bool Released
+        ) override;
+        void OnRefresh(HDC hdc, int phase) override;
 
     private:
 
