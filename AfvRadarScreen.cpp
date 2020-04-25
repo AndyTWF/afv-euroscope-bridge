@@ -30,6 +30,10 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
         return;
     }
 
+    // Make all text white
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(255, 255, 255));
+
     AfvBridge * plugin = (AfvBridge *) this->GetPlugIn();
 
     //Background
@@ -59,7 +63,7 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     DrawText(hdc, L"RX", 2, &this->rxRect, DT_VCENTER | DT_CENTER);
 
     // Last Received Header
-    DrawText(hdc, L"Last Received:", 14, &this->lastReceivedRect, DT_VCENTER | DT_CENTER);
+    DrawText(hdc, L"Last Receive:", 14, &this->lastReceivedRect, DT_VCENTER | DT_CENTER);
 
     const std::set<std::string>& lastReceived = plugin->GetLastTransmitted();
     std::set<std::string>::const_iterator iterator = lastReceived.cbegin();
