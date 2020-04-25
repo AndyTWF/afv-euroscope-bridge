@@ -7,7 +7,9 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         ~AfvRadarScreen();
 
         // Inherited via CRadarScreen
+        void OnAsrContentLoaded(bool Loaded) override;
         void OnAsrContentToBeClosed(void) override;
+        void OnAsrContentToBeSaved(void) override;
         void OnMoveScreenObject(
             int ObjectType,
             const char* sObjectId,
@@ -19,6 +21,7 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
 
     private:
 
+        bool IsInteger(std::string number) const;
         void Move(int xPos, int yPos);
 
         // Render data
@@ -50,5 +53,15 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         HBRUSH backgroundBrush;
         HBRUSH txRxActiveBrush;
         HBRUSH headerBrush;
+
+        // ASR settings
+        std::string settingKeyXPos = "afvXPos";
+        std::string settingDescriptionXPos = "AFV Display X Position";
+
+        std::string settingKeyYPos = "afvYPos";
+        std::string settingDescriptionYPos = "AFV Display Y Position";
+
+        std::string settingKeyVisible = "afvVisible";
+        std::string settingDescriptionVisible = "Render AFV Display";
 };
 
