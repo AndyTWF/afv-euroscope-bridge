@@ -19,5 +19,6 @@
 #include <Windows.h>
 #include <regex>
 #include <functional>
+#include <wtypes.h>
 
 #endif //PCH_H

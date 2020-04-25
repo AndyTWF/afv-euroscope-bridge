@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AfvBridge.h"
+#include "AfvRadarScreen.h"
 #include "HiddenWindow.h"
 
 
@@ -101,6 +102,11 @@ void AfvBridge::AddMessageToQueue(std::string message)
 {
     std::lock_guard<std::mutex> lock(this->messageLock);
     this->messages.push(message);
+}
+
+EuroScopePlugIn::CRadarScreen* AfvBridge::OnRadarScreenCreated(const char* sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated)
+{
+    return new AfvRadarScreen;
 }
 
 void AfvBridge::ProcessMessage(std::string message)

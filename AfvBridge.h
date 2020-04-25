@@ -7,6 +7,13 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         AfvBridge(void);
         ~AfvBridge(void);
         void AddMessageToQueue(std::string message);
+        EuroScopePlugIn::CRadarScreen* OnRadarScreenCreated(
+            const char* sDisplayName,
+            bool NeedRadarContent,
+            bool GeoReferenced,
+            bool CanBeSaved,
+            bool CanBeCreated
+        ) override;
         void OnTimer(int counter) override;
 
 #ifdef _DEBUG
