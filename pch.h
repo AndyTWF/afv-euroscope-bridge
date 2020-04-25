@@ -20,5 +20,9 @@
 #include <regex>
 #include <functional>
 #include <wtypes.h>
+#include <set>
+#include <locale>
+#include <codecvt>
+#include <string>
 
 #endif //PCH_H

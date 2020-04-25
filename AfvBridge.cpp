@@ -64,13 +64,56 @@ void AfvBridge::OnTimer(int counter)
     }
 }
 
+bool AfvBridge::IsTransmitting(void) const
+{
+    return this->isTransmitting;
+}
+
+bool AfvBridge::IsReceiving(void) const
+{
+    return this->isReceiving;
+}
+
+const std::set<std::string>& AfvBridge::GetLastTransmitted(void) const
+{
+    return this->lastTransmitted;
+}
+
 #ifdef _DEBUG
 bool AfvBridge::OnCompileCommand(const char* command)
 {
     std::string commandString(command);
 
-    // Check message
-    if (commandString.substr(0, 5) != ".afv ") {
+    // Receive light check
+    if (commandString == ".afv receive") {
+        this->isReceiving = !this->isReceiving;
+        return true;
+    }
+
+    // Transmit light check
+    if (commandString == ".afv transmit") {
+        this->isTransmitting = !this->isTransmitting;
+        return true;
+    }
+
+    // Last callsign transmitting check
+    if (commandString.substr(0, 10) == ".afv last ") {
+        this->lastTransmitted.clear();
+        std::string callsigns = commandString.substr(10);
+
+        size_t pos = 0;
+        while ((pos = callsigns.find(' ')) != std::string::npos) {
+            this->lastTransmitted.insert(callsigns.substr(0, pos));
+            callsigns.erase(0, pos + 1);
+        }
+
+        // Pick up the last one
+        this->lastTransmitted.insert(callsigns);
+        return true;
+    }
+
+    // Message test
+    if (commandString != ".afv message") {
         return false;
     }
 

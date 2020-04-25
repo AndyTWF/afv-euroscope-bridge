@@ -15,6 +15,9 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
             bool CanBeCreated
         ) override;
         void OnTimer(int counter) override;
+        bool IsTransmitting(void) const;
+        bool IsReceiving(void) const;
+        const std::set<std::string>& GetLastTransmitted(void) const;
 
 #ifdef _DEBUG
         bool OnCompileCommand(const char* command);
@@ -55,4 +58,9 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
            NULL,
            L"AfvBridgeHiddenWindowClass"
         };
+
+        // Transmitting and Receiving
+        bool isTransmitting = false;
+        bool isReceiving = false;
+        std::set<std::string> lastTransmitted;
 };

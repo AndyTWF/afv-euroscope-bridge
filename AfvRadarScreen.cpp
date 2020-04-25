@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "AfvRadarScreen.h"
+#include "AfvBridge.h"
 
 
 AfvRadarScreen::AfvRadarScreen()
 {
     this->Move(this->startCoordinate, this->startCoordinate);
-    this->backgroundBrush = CreateSolidBrush(RGB(0, 0, 0));
+    this->backgroundBrush = CreateSolidBrush(RGB(32, 32, 32));
     this->txRxActiveBrush = CreateSolidBrush(RGB(234, 173, 92));
+    this->txRxInactiveBrush = CreateSolidBrush(RGB(0, 0, 0));
     this->headerBrush = CreateSolidBrush(RGB(128, 128, 128));
 }
 
@@ -15,6 +17,7 @@ AfvRadarScreen::~AfvRadarScreen()
     this->OnAsrContentToBeSaved();
     DeleteObject(this->backgroundBrush);
     DeleteObject(this->txRxActiveBrush);
+    DeleteObject(this->txRxInactiveBrush);
     DeleteObject(this->headerBrush);
 }
 
@@ -25,6 +28,8 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
         return;
     }
 
+    AfvBridge * plugin = (AfvBridge *) this->GetPlugIn();
+
     //Background
     FillRect(hdc, &this->windowRect, this->backgroundBrush);
     this->AddScreenObject(1, "afvWindow", this->windowRect, true, "");
@@ -34,16 +39,41 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     DrawText(hdc, L"AFV", 3, &this->headerRect, DT_VCENTER | DT_CENTER);
 
     // TX
-    FillRect(hdc, &this->txRect, this->txRxActiveBrush);
+    FillRect(hdc, &this->txRect, plugin->IsTransmitting() ? this->txRxActiveBrush : this->txRxInactiveBrush);
     DrawText(hdc, L"TX", 2, &this->txRect, DT_VCENTER | DT_CENTER);
 
     // RX
-    FillRect(hdc, &this->rxRect, this->txRxActiveBrush);
+    FillRect(hdc, &this->rxRect, plugin->IsReceiving() ? this->txRxActiveBrush : this->txRxInactiveBrush);
     DrawText(hdc, L"RX", 2, &this->rxRect, DT_VCENTER | DT_CENTER);
 
-    // Last Received
-    std::wstring lastReceived = L"Last: BAW47C";
-    DrawText(hdc, lastReceived.c_str(), lastReceived.size(), &this->lastReceivedRect, DT_VCENTER | DT_CENTER | DT_WORDBREAK);
+    // Last Received Header
+    DrawText(hdc, L"Last Received:", 14, &this->lastReceivedRect, DT_VCENTER | DT_CENTER);
+
+    const std::set<std::string>& lastReceived = plugin->GetLastTransmitted();
+    std::set<std::string>::const_iterator iterator = lastReceived.cbegin();
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+    // Last Received Callsign 1
+    if (iterator != lastReceived.cend()) {
+        std::wstring callsign = converter.from_bytes(*iterator);
+        DrawText(hdc, callsign.c_str(), callsign.size(), &this->lastReceivedCallsignOneRect, DT_VCENTER | DT_LEFT);
+        iterator++;
+    }
+
+    // Last Received Callsign 2
+    if (iterator != lastReceived.cend()) {
+        std::wstring callsign = converter.from_bytes(*iterator);
+        DrawText(hdc, callsign.c_str(), callsign.size(), &this->lastReceivedCallsignTwoRect, DT_VCENTER | DT_LEFT);
+        iterator++;
+    }
+
+    // Last Received Callsign 3
+    if (iterator != lastReceived.cend()) {
+        std::wstring callsign = converter.from_bytes(*iterator);
+        DrawText(hdc, callsign.c_str(), callsign.size(), &this->lastReceivedCallsignThreeRect, DT_VCENTER | DT_LEFT);
+        iterator++;
+    }
+
 }
 
 bool AfvRadarScreen::IsInteger(std::string number) const
@@ -84,9 +114,30 @@ void AfvRadarScreen::Move(int xPos, int yPos)
 
     this->lastReceivedRect = {
         xPos + this->margin,
-        this->txRect.bottom + this->lastReceivedOffset,
+        this->txRect.bottom + this->lastReceivedHeaderOffset,
         this->rxRect.right,
-        this->txRect.bottom + this->lastReceivedOffset + this->lastReceivedHeight
+        this->txRect.bottom + this->lastReceivedHeaderOffset + this->lastReceivedHeight
+    };
+
+    this->lastReceivedCallsignOneRect = {
+        xPos + this->margin,
+        this->lastReceivedRect.bottom + this->lastReceivedDataOffset,
+        this->rxRect.right,
+        this->lastReceivedRect.bottom + this->lastReceivedDataOffset + this->lastReceivedHeight
+    };
+
+    this->lastReceivedCallsignTwoRect = {
+        xPos + this->margin,
+        this->lastReceivedCallsignOneRect.bottom + this->lastReceivedDataOffset,
+        this->rxRect.right,
+        this->lastReceivedCallsignOneRect.bottom + this->lastReceivedDataOffset + this->lastReceivedHeight
+    };
+
+    this->lastReceivedCallsignThreeRect = {
+        xPos + this->margin,
+        this->lastReceivedCallsignTwoRect.bottom + this->lastReceivedDataOffset,
+        this->rxRect.right,
+        this->lastReceivedCallsignTwoRect.bottom + this->lastReceivedDataOffset + this->lastReceivedHeight
     };
 }
 

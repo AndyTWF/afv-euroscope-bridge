@@ -33,11 +33,14 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         RECT rxRect;
         RECT headerRect;
         RECT lastReceivedRect;
+        RECT lastReceivedCallsignOneRect;
+        RECT lastReceivedCallsignTwoRect;
+        RECT lastReceivedCallsignThreeRect;
 
         // Fixed coordinates
         const int startCoordinate = 100;
         const int windowWidth = 105;
-        const int windowHeight = 100;
+        const int windowHeight = 150;
 
         const int txRxWidth = 40;
         const int txRxHeight = 15;
@@ -46,12 +49,14 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         const int txRxOffsetY = 10;
         const int headerHeight = 15;
 
-        const int lastReceivedOffset = 10;
+        const int lastReceivedHeaderOffset = 15;
         const int lastReceivedHeight = 15;
+        const int lastReceivedDataOffset = 5;
 
         // Brushes
         HBRUSH backgroundBrush;
         HBRUSH txRxActiveBrush;
+        HBRUSH txRxInactiveBrush;
         HBRUSH headerBrush;
 
         // ASR settings
