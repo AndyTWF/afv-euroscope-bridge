@@ -221,6 +221,23 @@ void AfvRadarScreen::OnAsrContentToBeSaved(void)
     );
 }
 
+bool AfvRadarScreen::OnCompileCommand(const char* sCommandLine)
+{
+    std::string command(sCommandLine);
+
+    if (command == ".afv show") {
+        this->shouldRender = true;
+        return true;
+    }
+
+    if (command == ".afv hide") {
+        this->shouldRender = false;
+        return true;
+    }
+
+    return false;
+}
+
 void AfvRadarScreen::OnMoveScreenObject(int ObjectType, const char* sObjectId, POINT Pt, RECT Area, bool Released)
 {
     this->Move(Area.left, Area.top);
