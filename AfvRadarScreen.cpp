@@ -7,7 +7,7 @@ AfvRadarScreen::AfvRadarScreen()
     this->Move(this->startCoordinate, this->startCoordinate);
     this->backgroundBrush = CreateSolidBrush(RGB(0, 0, 0));
     this->txRxActiveBrush = CreateSolidBrush(RGB(234, 173, 92));
-    this->headerBrush = CreateSolidBrush(RGB(32, 32, 32));
+    this->headerBrush = CreateSolidBrush(RGB(128, 128, 128));
 }
 
 AfvRadarScreen::~AfvRadarScreen()
