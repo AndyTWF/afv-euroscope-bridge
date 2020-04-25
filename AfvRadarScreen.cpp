@@ -10,6 +10,7 @@ AfvRadarScreen::AfvRadarScreen()
     this->txRxActiveBrush = CreateSolidBrush(RGB(234, 173, 92));
     this->txRxInactiveBrush = CreateSolidBrush(RGB(0, 0, 0));
     this->headerBrush = CreateSolidBrush(RGB(128, 128, 128));
+    this->buttonOutlineBrush = CreateSolidBrush(RGB(102, 102, 102));
 }
 
 AfvRadarScreen::~AfvRadarScreen()
@@ -19,6 +20,7 @@ AfvRadarScreen::~AfvRadarScreen()
     DeleteObject(this->txRxActiveBrush);
     DeleteObject(this->txRxInactiveBrush);
     DeleteObject(this->headerBrush);
+    DeleteObject(this->buttonOutlineBrush);
 }
 
 void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
@@ -37,6 +39,16 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     // Header Bar
     FillRect(hdc, &this->headerRect, this->headerBrush);
     DrawText(hdc, L"AFV", 3, &this->headerRect, DT_VCENTER | DT_CENTER);
+
+    // Settings Button
+    FrameRect(hdc, &this->settingsRect, this->buttonOutlineBrush);
+    DrawText(hdc, L"SET", 3, &this->settingsRect, DT_VCENTER | DT_CENTER);
+    this->AddScreenObject(1, "setButton", this->settingsRect, true, "");
+
+    // VCCS Button
+    FrameRect(hdc, &this->vccsRect, this->buttonOutlineBrush);
+    DrawText(hdc, L"VCCS", 4, &this->vccsRect, DT_VCENTER | DT_CENTER);
+    this->AddScreenObject(1, "vccsButton", this->vccsRect, true, "");
 
     // TX
     FillRect(hdc, &this->txRect, plugin->IsTransmitting() ? this->txRxActiveBrush : this->txRxInactiveBrush);
@@ -98,18 +110,32 @@ void AfvRadarScreen::Move(int xPos, int yPos)
         yPos + this->headerHeight,
     };
 
+    this->settingsRect = {
+        xPos + this->buttonsMargin,
+        this->headerRect.bottom + this->txRxOffsetY,
+        xPos + this->buttonsMargin + this->txRxWidth,
+        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
+    };
+
+    this->vccsRect = {
+        this->settingsRect.right + this->buttonsGap,
+        this->headerRect.bottom + this->txRxOffsetY,
+        this->settingsRect.right + this->buttonsGap + this->txRxWidth,
+        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
+    };
+
     this->txRect = {
         xPos + this->margin,
-        yPos + this->headerHeight + this->txRxOffsetY,
+        this->settingsRect.bottom + this->txRxOffsetY,
         xPos + this->margin + this->txRxWidth,
-        yPos + this->headerHeight + this->txRxOffsetY + this->txRxHeight,
+        this->settingsRect.bottom + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->rxRect = {
-        xPos + this->margin + this->txRxWidth + this->txRxGap,
-        yPos + this->headerHeight + this->txRxOffsetY,
-        xPos + this->margin + this->txRxWidth + this->txRxGap + this->txRxWidth,
-        yPos + this->headerHeight + this->txRxOffsetY + this->txRxHeight,
+        this->txRect.right + this->txRxGap,
+        this->settingsRect.bottom + this->txRxOffsetY,
+        this->txRect.right + this->txRxGap + this->txRxWidth,
+        this->settingsRect.bottom + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->lastReceivedRect = {

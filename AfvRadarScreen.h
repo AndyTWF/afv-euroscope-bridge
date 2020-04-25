@@ -32,6 +32,8 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         RECT txRect;
         RECT rxRect;
         RECT headerRect;
+        RECT vccsRect;
+        RECT settingsRect;
         RECT lastReceivedRect;
         RECT lastReceivedCallsignOneRect;
         RECT lastReceivedCallsignTwoRect;
@@ -40,12 +42,14 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         // Fixed coordinates
         const int startCoordinate = 100;
         const int windowWidth = 105;
-        const int windowHeight = 150;
+        const int windowHeight = 155;
 
         const int txRxWidth = 40;
         const int txRxHeight = 15;
         const int txRxGap = 15;
+        const int buttonsGap = 5;
         const int margin = 5;
+        const int buttonsMargin = 10;
         const int txRxOffsetY = 10;
         const int headerHeight = 15;
 
@@ -58,6 +62,7 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         HBRUSH txRxActiveBrush;
         HBRUSH txRxInactiveBrush;
         HBRUSH headerBrush;
+        HBRUSH buttonOutlineBrush;
 
         // ASR settings
         std::string settingKeyXPos = "afvXPos";
