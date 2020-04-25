@@ -48,6 +48,8 @@ AfvBridge::~AfvBridge(void)
     if (this->hiddenWindow != NULL) {
         DestroyWindow(this->hiddenWindow);
     }
+
+    UnregisterClass(this->windowClass.lpszClassName, GetModuleHandle(NULL));
 }
 
 /*
