@@ -27,6 +27,7 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         RECT windowRect;
         RECT txRect;
         RECT rxRect;
+        RECT headerRect;
 
         // Fixed coordinates
         const int startCoordinate = 100;
@@ -37,11 +38,13 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         const int txRxHeight = 15;
         const int txRxGap = 15;
         const int txOffsetX = 5;
-        const int txRxOffsetY = 15;
+        const int txRxOffsetY = 10;
+        const int headerHeight = 15;
 
 
         // Brushes
         HBRUSH backgroundBrush;
         HBRUSH txRxActiveBrush;
+        HBRUSH headerBrush;
 };
 

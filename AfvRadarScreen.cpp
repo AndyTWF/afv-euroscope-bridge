@@ -7,12 +7,14 @@ AfvRadarScreen::AfvRadarScreen()
     this->Move(this->startCoordinate, this->startCoordinate);
     this->backgroundBrush = CreateSolidBrush(RGB(0, 0, 0));
     this->txRxActiveBrush = CreateSolidBrush(RGB(234, 173, 92));
+    this->headerBrush = CreateSolidBrush(RGB(32, 32, 32));
 }
 
 AfvRadarScreen::~AfvRadarScreen()
 {
     DeleteObject(this->backgroundBrush);
     DeleteObject(this->txRxActiveBrush);
+    DeleteObject(this->headerBrush);
 }
 
 void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
@@ -25,6 +27,10 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     //Background
     FillRect(hdc, &this->windowRect, this->backgroundBrush);
     this->AddScreenObject(1, "afvWindow", this->windowRect, true, "");
+
+    // Header Bar
+    FillRect(hdc, &this->headerRect, this->headerBrush);
+    DrawText(hdc, L"AFV", 3, &this->headerRect, DT_VCENTER | DT_CENTER);
 
     // TX
     FillRect(hdc, &this->txRect, this->txRxActiveBrush);
@@ -45,18 +51,25 @@ void AfvRadarScreen::Move(int xPos, int yPos)
         yPos + this->windowHeight,
     };
 
+    this->headerRect = {
+        xPos,
+        yPos,
+        xPos + this->windowWidth,
+        yPos + this->headerHeight,
+    };
+
     this->txRect = {
         xPos + this->txOffsetX,
-        yPos + this->txRxOffsetY,
+        yPos + this->headerHeight + this->txRxOffsetY,
         xPos + this->txOffsetX + this->txRxWidth,
-        yPos + this->txRxOffsetY + this->txRxHeight,
+        yPos + this->headerHeight + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->rxRect = {
         xPos + this->txOffsetX + this->txRxWidth + this->txRxGap,
-        yPos + this->txRxOffsetY,
+        yPos + this->headerHeight + this->txRxOffsetY,
         xPos + this->txOffsetX + this->txRxWidth + this->txRxGap + this->txRxWidth,
-        yPos + this->txRxOffsetY + this->txRxHeight,
+        yPos + this->headerHeight + this->txRxOffsetY + this->txRxHeight,
     };
 }
 
