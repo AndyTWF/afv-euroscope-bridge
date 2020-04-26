@@ -144,7 +144,11 @@ EuroScopePlugIn::CRadarScreen* AfvBridge::OnRadarScreenCreated(const char* sDisp
 */
 void AfvBridge::LoginCheck(void)
 {
-    if (!this->isLoggedIn && this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_NO) {
+    if (
+        !this->isLoggedIn &&
+        this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_NO &&
+        this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_VIA_PROXY
+    ) {
         SendApiMessage("FSD=TRUE", AFV_HIDDEN_WINDOW_CLASS);
         this->isLoggedIn = true;
     }
