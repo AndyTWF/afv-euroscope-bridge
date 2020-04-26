@@ -36,7 +36,7 @@ AfvBridge::AfvBridge(void)
         0,
         0,
         0,
-        HWND_MESSAGE,
+        NULL,
         NULL,
         GetModuleHandle(NULL),
         reinterpret_cast<LPVOID>(this)

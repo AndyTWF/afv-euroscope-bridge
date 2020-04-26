@@ -23,6 +23,9 @@ void SendSelfMessage(std::string message)
     SendMessageToTarget(window, message);
 }
 
+/*
+    Send a message to the AFV client
+*/
 void SendAfvClientMessage(std::string message)
 {
     DWORD afvProcessId = GetAfvProcessId();
@@ -43,6 +46,9 @@ void SendAfvClientMessage(std::string message)
     SendMessageToTarget(args.afvWindowHandle, message);
 }
 
+/*
+    Send a message to the specified target
+*/
 void SendMessageToTarget(HWND target, std::string message)
 {
     COPYDATASTRUCT cds;
@@ -58,15 +64,27 @@ void SendMessageToTarget(HWND target, std::string message)
     SendMessage(target, WM_COPYDATA, reinterpret_cast<WPARAM>(target), reinterpret_cast<LPARAM>(&cds));
 }
 
+/*
+    Get the main AFV window by process ID / title
+*/
 BOOL CALLBACK GetAfvWindow(HWND hwnd, LPARAM lParam) 
 {
-
     GetAfvWindowArgs* args = (GetAfvWindowArgs*)lParam;
     DWORD windowPid;
     GetWindowThreadProcessId(hwnd, &windowPid);
 
-    if (windowPid == (DWORD) lParam) {
-        args->afvWindowHandle = hwnd;
+    if (windowPid == args->afvProcessId) {
+        wchar_t buffer[1024];
+        GetWindowText(
+            hwnd,
+            buffer,
+            1024
+        );
+
+        // Many of the windows register here, so just use the main one
+        if (std::wstring(buffer) == L"AFVControllerClient") {
+            args->afvWindowHandle = hwnd;
+        }
     }
 
     return TRUE;
