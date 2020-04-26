@@ -58,7 +58,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         HWND hiddenWindow = NULL;
 
         // Class for our window
-        WNDCLASS windowClass = {
+        WNDCLASSW windowClass = {
            NULL,
            HiddenWindow,
            NULL,

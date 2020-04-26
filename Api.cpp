@@ -19,7 +19,7 @@ void SendSelfMessage(std::string message)
     cds.lpData = (PVOID)message.c_str();
 
     // Find the hidden window
-    HWND window = FindWindowEx(NULL, NULL, HIDDEN_WINDOW_CLASS, NULL);
+    HWND window = FindWindowExW(NULL, NULL, HIDDEN_WINDOW_CLASS, NULL);
     SendMessageToTarget(window, message);
 }
 
@@ -75,7 +75,7 @@ BOOL CALLBACK GetAfvWindow(HWND hwnd, LPARAM lParam)
 
     if (windowPid == args->afvProcessId) {
         wchar_t buffer[1024];
-        GetWindowText(
+        GetWindowTextW(
             hwnd,
             buffer,
             1024
@@ -106,7 +106,7 @@ void StartAfvClient(void)
         std::wstring afvExe = path.substr(0, path.find_last_of(L'\\') + 1) + exeName;
 
         // Additional information
-        STARTUPINFO si;
+        STARTUPINFOW si;
         PROCESS_INFORMATION pi;
 
         // set the size of the structures
@@ -115,7 +115,7 @@ void StartAfvClient(void)
         ZeroMemory(&pi, sizeof(pi));
 
        // start the program up
-       BOOL loaded = CreateProcess(
+       BOOL loaded = CreateProcessW(
             afvExe.c_str(),   // the path
             NULL,        // Command line
             NULL,           // Process handle not inheritable
@@ -137,7 +137,7 @@ void StartAfvClient(void)
             std::wstring code = std::to_wstring(GetLastError());
             std::wstring message = L"Failed to load AFV client, please load it manually.\r\n\r\n";
             message += L"Failed to load AFV Client process. Code = " + code;
-            MessageBox(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
+            MessageBoxW(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         }
     }
 }
@@ -151,14 +151,14 @@ DWORD GetAfvProcessId(void)
 
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     pe32.dwSize = sizeof(PROCESSENTRY32W);
-    Process32First(hSnap, &pe32);
+    Process32FirstW(hSnap, &pe32);
 
     bool afvRunning = false;
     iDone = 1;
 
     // Check to see if AFV is already running
     while (iDone) {
-        iDone = Process32Next(hSnap, &pe32);
+        iDone = Process32NextW(hSnap, &pe32);
         if (std::wstring(pe32.szExeFile) == exeName)
         {
             return pe32.th32ProcessID;
@@ -176,23 +176,23 @@ std::wstring GetDllPath(void)
     wchar_t path[MAX_PATH];
     HMODULE hm = NULL;
 
-    if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+    if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
         GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
         (LPCWSTR)&EuroScopePlugInInit, &hm) == 0)
     {
         std::wstring code = std::to_wstring(GetLastError());
         std::wstring message = L"Failed to load AFV client, please load it manually.\r\n\r\n";
         message += L"Failed to load codule handle. Code = " + code;
-        MessageBox(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
+        MessageBoxW(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         return L"";
     }
 
-    if (GetModuleFileName(hm, path, sizeof(path)) == 0)
+    if (GetModuleFileNameW(hm, path, sizeof(path)) == 0)
     {
         std::wstring code = std::to_wstring(GetLastError());
         std::wstring message = L"Failed to load AFV client, please load it manually.\r\n\r\n";
         message += L"Failed to get module path. Code = " + code;
-        MessageBox(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
+        MessageBoxW(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         return L"";
     }
 

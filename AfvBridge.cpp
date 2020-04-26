@@ -14,7 +14,7 @@ AfvBridge::AfvBridge(void)
         PLUGIN_COPYRIGHT
     )
 {
-    if (!RegisterClass(&this->windowClass)) {
+    if (!RegisterClassW(&this->windowClass)) {
         this->DisplayUserMessage(
             "AFV_BRIDGE",
             "AFV_BRIDGE",
@@ -28,7 +28,7 @@ AfvBridge::AfvBridge(void)
         return;
     }
 
-    this->hiddenWindow = CreateWindow(
+    this->hiddenWindow = CreateWindowW(
         L"AfvBridgeHiddenWindowClass",
         L"AfvBridgeHiddenWindow",
         NULL,
@@ -62,7 +62,7 @@ AfvBridge::~AfvBridge(void)
         DestroyWindow(this->hiddenWindow);
     }
 
-    UnregisterClass(this->windowClass.lpszClassName, GetModuleHandle(NULL));
+    UnregisterClassW(this->windowClass.lpszClassName, GetModuleHandle(NULL));
 }
 
 /*

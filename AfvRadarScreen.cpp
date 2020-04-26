@@ -44,31 +44,31 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
 
     // Header Bar
     FillRect(hdc, &this->headerRect, this->headerBrush);
-    DrawText(hdc, L"AFV", 3, &this->headerRect, DT_VCENTER | DT_CENTER);
+    DrawTextW(hdc, L"AFV", 3, &this->headerRect, DT_VCENTER | DT_CENTER);
 
     // Settings Button
     FrameRect(hdc, &this->settingsRect, plugin->IsSettingsOpen() ? this->txRxActiveBrush : this->buttonOutlineBrush);
-    DrawText(hdc, L"SET", 3, &this->settingsRect, DT_VCENTER | DT_CENTER);
+    DrawTextW(hdc, L"SET", 3, &this->settingsRect, DT_VCENTER | DT_CENTER);
     this->AddScreenObject(1, "setButton", this->settingsRect, true, "");
 
     // VCCS Button
     FrameRect(hdc, &this->vccsRect, plugin->IsVccsOpen() ? this->txRxActiveBrush : this->buttonOutlineBrush);
-    DrawText(hdc, L"VCCS", 4, &this->vccsRect, DT_VCENTER | DT_CENTER);
+    DrawTextW(hdc, L"VCCS", 4, &this->vccsRect, DT_VCENTER | DT_CENTER);
     this->AddScreenObject(1, "vccsButton", this->vccsRect, true, "");
 
     // TX
     FillRect(hdc, &this->txRect, plugin->IsTransmitting() ? this->txRxActiveBrush : this->txRxInactiveBrush);
-    DrawText(hdc, L"TX", 2, &this->txRect, DT_VCENTER | DT_CENTER);
+    DrawTextW(hdc, L"TX", 2, &this->txRect, DT_VCENTER | DT_CENTER);
 
     // RX
     FillRect(hdc, &this->rxRect, plugin->IsReceiving() ? this->txRxActiveBrush : this->txRxInactiveBrush);
-    DrawText(hdc, L"RX", 2, &this->rxRect, DT_VCENTER | DT_CENTER);
+    DrawTextW(hdc, L"RX", 2, &this->rxRect, DT_VCENTER | DT_CENTER);
 
     // Last Received Callsign
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring last(L"Last: " + converter.from_bytes(plugin->GetLastTransmitted()));
 
-    DrawText(hdc, last.c_str(), last.size() , &this->lastReceivedRect, DT_VCENTER | DT_LEFT);
+    DrawTextW(hdc, last.c_str(), last.size() , &this->lastReceivedRect, DT_VCENTER | DT_LEFT);
 }
 
 bool AfvRadarScreen::IsInteger(std::string number) const
