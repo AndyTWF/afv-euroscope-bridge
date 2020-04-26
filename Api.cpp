@@ -3,10 +3,15 @@
 
 const std::wstring exeName = L"GeoVR.VATSIM.ControllerClient.exe";
 
+struct GetAfvWindowArgs {
+    const DWORD afvProcessId;
+    HWND afvWindowHandle;
+};
+
 /*
     Send a message to the specified target window
 */
-void SendApiMessage(std::string message, std::wstring target)
+void SendSelfMessage(std::string message)
 {
     COPYDATASTRUCT cds;
     cds.dwData = 666;
@@ -14,13 +19,57 @@ void SendApiMessage(std::string message, std::wstring target)
     cds.lpData = (PVOID)message.c_str();
 
     // Find the hidden window
-    HWND window = FindWindowEx(NULL, NULL, target.c_str(), NULL);
-    if (window == NULL) {
+    HWND window = FindWindowEx(NULL, NULL, HIDDEN_WINDOW_CLASS, NULL);
+    SendMessageToTarget(window, message);
+}
+
+void SendAfvClientMessage(std::string message)
+{
+    DWORD afvProcessId = GetAfvProcessId();
+
+    if (afvProcessId == NULL) {
+        return;
+    }
+
+    GetAfvWindowArgs args = {
+        afvProcessId,
+        NULL
+    };
+
+    if (EnumWindows(&GetAfvWindow, (LPARAM)&args) == FALSE) {
+        return;
+    }
+
+    SendMessageToTarget(args.afvWindowHandle, message);
+}
+
+void SendMessageToTarget(HWND target, std::string message)
+{
+    COPYDATASTRUCT cds;
+    cds.dwData = 666;
+    cds.cbData = message.size() + 1;
+    cds.lpData = (PVOID)message.c_str();
+
+    if (target == NULL) {
         return;
     }
 
     // Send the data
-    SendMessage(window, WM_COPYDATA, reinterpret_cast<WPARAM>(window), reinterpret_cast<LPARAM>(&cds));
+    SendMessage(target, WM_COPYDATA, reinterpret_cast<WPARAM>(target), reinterpret_cast<LPARAM>(&cds));
+}
+
+BOOL CALLBACK GetAfvWindow(HWND hwnd, LPARAM lParam) 
+{
+
+    GetAfvWindowArgs* args = (GetAfvWindowArgs*)lParam;
+    DWORD windowPid;
+    GetWindowThreadProcessId(hwnd, &windowPid);
+
+    if (windowPid == (DWORD) lParam) {
+        args->afvWindowHandle = hwnd;
+    }
+
+    return TRUE;
 }
 
 /*
@@ -28,30 +77,8 @@ void SendApiMessage(std::string message, std::wstring target)
 */
 void StartAfvClient(void)
 {
-    PROCESSENTRY32W pe32 = { 0 };
-    HANDLE    hSnap;
-    int       iDone;
-    int       iTime = 60;
-
-    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    pe32.dwSize = sizeof(PROCESSENTRY32W);
-    Process32First(hSnap, &pe32);
-
-    bool afvRunning = false;
-    iDone = 1;
-
-    // Check to see if AFV is already running
-    while (iDone) {
-        iDone = Process32Next(hSnap, &pe32);
-        if (std::wstring(pe32.szExeFile) == exeName)
-        {
-            afvRunning = true;
-            iDone = 0;
-        }
-    }
-
     // If AFV is not running, load it
-    if (!afvRunning) {
+    if (GetAfvProcessId() == NULL) {
         std::wstring path = GetDllPath();
 
         if (path == L"") {
@@ -92,9 +119,35 @@ void StartAfvClient(void)
             std::wstring code = std::to_wstring(GetLastError());
             std::wstring message = L"Failed to load AFV client, please load it manually.\r\n\r\n";
             message += L"Failed to load AFV Client process. Code = " + code;
-            MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
+            MessageBox(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         }
     }
+}
+
+DWORD GetAfvProcessId(void)
+{
+    PROCESSENTRY32W pe32 = { 0 };
+    HANDLE    hSnap;
+    int       iDone;
+    int       iTime = 60;
+
+    hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    pe32.dwSize = sizeof(PROCESSENTRY32W);
+    Process32First(hSnap, &pe32);
+
+    bool afvRunning = false;
+    iDone = 1;
+
+    // Check to see if AFV is already running
+    while (iDone) {
+        iDone = Process32Next(hSnap, &pe32);
+        if (std::wstring(pe32.szExeFile) == exeName)
+        {
+            return pe32.th32ProcessID;
+        }
+    }
+
+    return NULL;
 }
 
 /*
@@ -112,7 +165,7 @@ std::wstring GetDllPath(void)
         std::wstring code = std::to_wstring(GetLastError());
         std::wstring message = L"Failed to load AFV client, please load it manually.\r\n\r\n";
         message += L"Failed to load codule handle. Code = " + code;
-        MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
+        MessageBox(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         return L"";
     }
 
@@ -121,7 +174,7 @@ std::wstring GetDllPath(void)
         std::wstring code = std::to_wstring(GetLastError());
         std::wstring message = L"Failed to load AFV client, please load it manually.\r\n\r\n";
         message += L"Failed to get module path. Code = " + code;
-        MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
+        MessageBox(GetActiveWindow(), message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         return L"";
     }
 

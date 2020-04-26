@@ -229,12 +229,12 @@ void AfvRadarScreen::OnClickScreenObject(int objectType, const char* sObjectId, 
 
     if (screenObject == "setButton") {
         std::string value = ConvertBool(!((AfvBridge*)this->GetPlugIn())->IsSettingsOpen());
-        SendApiMessage("SETTINGS=" + value, AFV_HIDDEN_WINDOW_CLASS);
-        SendApiMessage("SETTINGS=" + value, HIDDEN_WINDOW_CLASS);
+        SendSelfMessage("SETTINGS=" + value);
+        SendAfvClientMessage("SETTINGS=" + value);
     } else if (screenObject == "vccsButton") {
         std::string value = ConvertBool(!((AfvBridge*)this->GetPlugIn())->IsVccsOpen());
-        SendApiMessage("VCCS=" + value, AFV_HIDDEN_WINDOW_CLASS);
-        SendApiMessage("VCCS=" + value, HIDDEN_WINDOW_CLASS);
+        SendSelfMessage("VCCS=" + value);
+        SendAfvClientMessage("VCCS=" + value);
     }
 }
 

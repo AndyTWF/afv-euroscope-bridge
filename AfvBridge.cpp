@@ -36,7 +36,7 @@ AfvBridge::AfvBridge(void)
         0,
         0,
         0,
-        NULL,
+        HWND_MESSAGE,
         NULL,
         GetModuleHandle(NULL),
         reinterpret_cast<LPVOID>(this)
@@ -119,7 +119,7 @@ bool AfvBridge::OnCompileCommand(const char* command)
 
     // Create copy data
     std::string message = commandString.substr(5);
-    SendApiMessage(message, this->windowClass.lpszClassName);
+    SendSelfMessage(message);
     return true;
 }
 #endif // _DEBUG
@@ -154,11 +154,11 @@ void AfvBridge::LoginCheck(void)
         this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_NO &&
         this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_VIA_PROXY
     ) {
-        SendApiMessage("FSD=TRUE", AFV_HIDDEN_WINDOW_CLASS);
+        SendAfvClientMessage("FSD=TRUE");
         this->isLoggedIn = true;
     }
     else if (this->isLoggedIn && this->GetConnectionType() == EuroScopePlugIn::CONNECTION_TYPE_NO) {
-        SendApiMessage("FSD=FALSE", AFV_HIDDEN_WINDOW_CLASS);
+        SendAfvClientMessage("FSD=FALSE");
         this->isLoggedIn = false;
         this->userFrequency = 199.998;
         this->userCallsign = "";
@@ -180,7 +180,7 @@ void AfvBridge::ControllerCheck(void)
     // Check callsign
     if (me.GetCallsign() != this->userCallsign) {
         this->userCallsign = me.GetCallsign();
-        SendApiMessage("CONTROLLER=" + std::string(me.GetCallsign()), AFV_HIDDEN_WINDOW_CLASS);
+        SendAfvClientMessage("CONTROLLER=" + std::string(me.GetCallsign()));
     }
 
     // Check primary frequency
@@ -189,7 +189,7 @@ void AfvBridge::ControllerCheck(void)
         std::stringstream stream;
         stream << std::fixed << std::setprecision(3) << me.GetPrimaryFrequency();
 
-        SendApiMessage("PRIM=" + stream.str(), AFV_HIDDEN_WINDOW_CLASS);
+        SendAfvClientMessage("PRIM=" + stream.str());
     }
 }
 
