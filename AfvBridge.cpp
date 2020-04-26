@@ -278,6 +278,15 @@ void AfvBridge::ProcessVCCSMessage(std::string message)
     }
 }
 
+void AfvBridge::ProcessResetMessage(void)
+{
+    this->isTransmitting = false;
+    this->isReceiving = false;
+    this->settingsOpen = false;
+    this->vccsOpen = false;
+    this->lastTransmitted = "";
+}
+
 /*
     Check the message type and delegate it to another method
 */
@@ -297,6 +306,9 @@ void AfvBridge::ProcessMessage(std::string message)
     }
     else if (message.substr(0, 9) == "SETTINGS=") {
         this->ProcessSettingsMessage(message);
+    }
+    else if (message == "RESET") {
+        this->ProcessResetMessage();
     }
     else {
         this->ProcessFrequencyChangeMessage(message);

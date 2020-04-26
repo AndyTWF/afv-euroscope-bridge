@@ -35,6 +35,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         void ProcessFrequencyChangeMessage(std::string message);
         void ProcessSettingsMessage(std::string message);
         void ProcessVCCSMessage(std::string message);
+        void ProcessResetMessage(void);
         void ProcessMessage(std::string message);
         bool ValidBoolean(std::string boolean) const;
         bool ConvertBoolean(std::string boolean) const;
