@@ -19,7 +19,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         bool IsReceiving(void) const;
         bool IsVccsOpen(void) const;
         bool IsSettingsOpen(void) const;
-        const std::set<std::string>& GetLastTransmitted(void) const;
+        const std::vector<std::string>& GetLastTransmitted(void) const;
 
 #ifdef _DEBUG
         bool OnCompileCommand(const char* command);
@@ -75,7 +75,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         bool isReceiving = false;
         bool vccsOpen = false;
         bool settingsOpen = false;
-        std::set<std::string> lastTransmitted;
+        std::vector<std::string> lastTransmitted;
         
         // ES status
         bool isLoggedIn = false;

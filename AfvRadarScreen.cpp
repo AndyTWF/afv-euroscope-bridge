@@ -67,8 +67,8 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     // Last Received Header
     DrawText(hdc, L"Last Receive:", 14, &this->lastReceivedRect, DT_VCENTER | DT_CENTER);
 
-    const std::set<std::string>& lastReceived = plugin->GetLastTransmitted();
-    std::set<std::string>::const_iterator iterator = lastReceived.cbegin();
+    const std::vector<std::string>& lastReceived = plugin->GetLastTransmitted();
+    std::vector<std::string>::const_iterator iterator = lastReceived.cbegin();
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     // Last Received Callsign 1
