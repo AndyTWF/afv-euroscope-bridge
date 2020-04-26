@@ -2,6 +2,7 @@
 #include "AfvBridge.h"
 #include "AfvRadarScreen.h"
 #include "HiddenWindow.h"
+#include "Api.h"
 
 
 AfvBridge::AfvBridge(void)
@@ -13,7 +14,19 @@ AfvBridge::AfvBridge(void)
         PLUGIN_COPYRIGHT
     )
 {
-    RegisterClass(&this->windowClass);
+    if (!RegisterClass(&this->windowClass)) {
+        this->DisplayUserMessage(
+            "AFV_BRIDGE",
+            "AFV_BRIDGE",
+            "Unable to register window class for AFV Bridge",
+            true,
+            true,
+            true,
+            true,
+            true
+        );
+        return;
+    }
 
     this->hiddenWindow = CreateWindow(
         L"AfvBridgeHiddenWindowClass",
@@ -76,6 +89,16 @@ bool AfvBridge::IsReceiving(void) const
     return this->isReceiving;
 }
 
+bool AfvBridge::IsVccsOpen(void) const
+{
+    return this->vccsOpen;
+}
+
+bool AfvBridge::IsSettingsOpen(void) const
+{
+    return this->settingsOpen;
+}
+
 const std::set<std::string>& AfvBridge::GetLastTransmitted(void) const
 {
     return this->lastTransmitted;
@@ -93,20 +116,7 @@ bool AfvBridge::OnCompileCommand(const char* command)
 
     // Create copy data
     std::string message = commandString.substr(5);
-
-    COPYDATASTRUCT cds;
-    cds.dwData = 666;
-    cds.cbData = message.size() + 1;
-    cds.lpData = (PVOID) message.c_str();
-
-    // Find the hidden window
-    HWND window = FindWindowEx(NULL, NULL, this->windowClass.lpszClassName, NULL);
-    if (window == NULL) {
-        return true;
-    }
-
-    // Send the data
-    SendMessage(window, WM_COPYDATA, reinterpret_cast<WPARAM>(window), reinterpret_cast<LPARAM>(&cds));
+    SendApiMessage(message, this->windowClass.lpszClassName);
     return true;
 }
 #endif // _DEBUG
@@ -186,6 +196,22 @@ void AfvBridge::ProcessFrequencyChangeMessage(std::string message)
     this->ToggleFrequency(std::stod(parts[0]), this->ConvertBoolean(parts[1]), this->ConvertBoolean(parts[2]));
 }
 
+void AfvBridge::ProcessSettingsMessage(std::string message)
+{
+    std::string setting = message.substr(9);
+    if (this->ValidBoolean(setting)) {
+        this->settingsOpen = this->ConvertBoolean(setting);
+    }
+}
+
+void AfvBridge::ProcessVCCSMessage(std::string message)
+{
+    std::string setting = message.substr(5);
+    if (this->ValidBoolean(setting)) {
+        this->vccsOpen = this->ConvertBoolean(setting);
+    }
+}
+
 void AfvBridge::ProcessMessage(std::string message)
 {
     if (message.substr(0, 3) == "TX=") {
@@ -196,6 +222,12 @@ void AfvBridge::ProcessMessage(std::string message)
     }
     else if (message.substr(0, 10) == "CALLSIGNS=") {
         this->ProcessCallsignsMessage(message);
+    }
+    else if (message.substr(0, 5) == "VCCS=") {
+        this->ProcessVCCSMessage(message);
+    }
+    else if (message.substr(0, 9) == "SETTINGS=") {
+        this->ProcessSettingsMessage(message);
     }
     else {
         this->ProcessFrequencyChangeMessage(message);

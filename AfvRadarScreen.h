@@ -10,6 +10,13 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         void OnAsrContentLoaded(bool Loaded) override;
         void OnAsrContentToBeClosed(void) override;
         void OnAsrContentToBeSaved(void) override;
+        void OnClickScreenObject(
+            int objectType,
+            const char* sObjectId,
+            POINT pt,
+            RECT area,
+            int button
+        );
         bool OnCompileCommand(const char* sCommandLine) override;
         void OnMoveScreenObject(
             int ObjectType,

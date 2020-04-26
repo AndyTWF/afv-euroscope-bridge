@@ -17,6 +17,8 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         void OnTimer(int counter) override;
         bool IsTransmitting(void) const;
         bool IsReceiving(void) const;
+        bool IsVccsOpen(void) const;
+        bool IsSettingsOpen(void) const;
         const std::set<std::string>& GetLastTransmitted(void) const;
 
 #ifdef _DEBUG
@@ -29,6 +31,8 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         void ProcessRxMessage(std::string message);
         void ProcessCallsignsMessage(std::string message);
         void ProcessFrequencyChangeMessage(std::string message);
+        void ProcessSettingsMessage(std::string message);
+        void ProcessVCCSMessage(std::string message);
         void ProcessMessage(std::string message);
         bool ValidBoolean(std::string boolean) const;
         bool ConvertBoolean(std::string boolean) const;
@@ -60,11 +64,13 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
            NULL,
            NULL,
            NULL,
-           L"AfvBridgeHiddenWindowClass"
+           HIDDEN_WINDOW_CLASS
         };
 
         // Transmitting and Receiving
         bool isTransmitting = false;
         bool isReceiving = false;
+        bool vccsOpen = false;
+        bool settingsOpen = false;
         std::set<std::string> lastTransmitted;
 };

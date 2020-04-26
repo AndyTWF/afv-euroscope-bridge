@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "AfvRadarScreen.h"
 #include "AfvBridge.h"
+#include "Conversions.h"
+#include "Api.h"
 
 
 AfvRadarScreen::AfvRadarScreen()
@@ -45,12 +47,12 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     DrawText(hdc, L"AFV", 3, &this->headerRect, DT_VCENTER | DT_CENTER);
 
     // Settings Button
-    FrameRect(hdc, &this->settingsRect, this->buttonOutlineBrush);
+    FrameRect(hdc, &this->settingsRect, plugin->IsSettingsOpen() ? this->txRxActiveBrush : this->buttonOutlineBrush);
     DrawText(hdc, L"SET", 3, &this->settingsRect, DT_VCENTER | DT_CENTER);
     this->AddScreenObject(1, "setButton", this->settingsRect, true, "");
 
     // VCCS Button
-    FrameRect(hdc, &this->vccsRect, this->buttonOutlineBrush);
+    FrameRect(hdc, &this->vccsRect, plugin->IsVccsOpen() ? this->txRxActiveBrush : this->buttonOutlineBrush);
     DrawText(hdc, L"VCCS", 4, &this->vccsRect, DT_VCENTER | DT_CENTER);
     this->AddScreenObject(1, "vccsButton", this->vccsRect, true, "");
 
@@ -219,6 +221,21 @@ void AfvRadarScreen::OnAsrContentToBeSaved(void)
         this->settingDescriptionYPos.c_str(),
         std::to_string(this->windowRect.top).c_str()
     );
+}
+
+void AfvRadarScreen::OnClickScreenObject(int objectType, const char* sObjectId, POINT pt, RECT area, int button)
+{
+    std::string screenObject(sObjectId);
+
+    if (screenObject == "setButton") {
+        std::string value = ConvertBool(!((AfvBridge*)this->GetPlugIn())->IsSettingsOpen());
+        SendApiMessage("SETTINGS=" + value, AFV_HIDDEN_WINDOW_CLASS);
+        SendApiMessage("SETTINGS=" + value, HIDDEN_WINDOW_CLASS);
+    } else if (screenObject == "vccsButton") {
+        std::string value = ConvertBool(!((AfvBridge*)this->GetPlugIn())->IsVccsOpen());
+        SendApiMessage("VCCS=" + value, AFV_HIDDEN_WINDOW_CLASS);
+        SendApiMessage("VCCS=" + value, HIDDEN_WINDOW_CLASS);
+    }
 }
 
 bool AfvRadarScreen::OnCompileCommand(const char* sCommandLine)
