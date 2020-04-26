@@ -86,7 +86,8 @@ void StartAfvClient(void)
         // If somethings broken, error message and crash the plugin
         if (!loaded) {
             std::wstring code = std::to_wstring(GetLastError());
-            std::wstring message = L"Failed To Load AFV Client Process, Code = " + code;
+            std::wstring message = L"Failed to load AFV client, please load it manually\r\n\r\n";
+            message += L"Failed to load AFV Client process. Code = " + code;
             MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
             throw std::exception();
         }
@@ -106,7 +107,8 @@ std::wstring GetDllPath(void)
         (LPCWSTR)&EuroScopePlugInInit, &hm) == 0)
     {
         std::wstring code = std::to_wstring(GetLastError());
-        std::wstring message = L"Failed To Load Module Handle, Code = " + code;
+        std::wstring message = L"Failed to load AFV client, please load it manually\r\n\r\n";
+        message += L"Failed to load codule handle. Code = " + code;
         MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         throw std::exception();
     }
@@ -114,7 +116,8 @@ std::wstring GetDllPath(void)
     if (GetModuleFileName(hm, path, sizeof(path)) == 0)
     {
         std::wstring code = std::to_wstring(GetLastError());
-        std::wstring message = L"Failed To Get Module Path, Code = " + code;
+        std::wstring message = L"Failed to load AFV client, please load it manually\r\n\r\n";
+        message += L"Failed to get module path. Code = " + code;
         MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
         throw std::exception();
     }
