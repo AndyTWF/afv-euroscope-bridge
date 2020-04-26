@@ -43,9 +43,6 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         RECT vccsRect;
         RECT settingsRect;
         RECT lastReceivedRect;
-        RECT lastReceivedCallsignOneRect;
-        RECT lastReceivedCallsignTwoRect;
-        RECT lastReceivedCallsignThreeRect;
 
         // Fixed coordinates
         const int startCoordinate = 100;
