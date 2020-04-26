@@ -54,6 +54,11 @@ void StartAfvClient(void)
     // If AFV is not running, load it
     if (!afvRunning) {
         std::wstring path = GetDllPath();
+
+        if (path == L"") {
+            return;
+        }
+
         std::wstring afvExe = path.substr(0, path.find_last_of(L'\\') + 1) + exeName;
 
         // Additional information
@@ -89,7 +94,6 @@ void StartAfvClient(void)
             std::wstring message = L"Failed to load AFV client, please load it manually\r\n\r\n";
             message += L"Failed to load AFV Client process. Code = " + code;
             MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
-            throw std::exception();
         }
     }
 }
@@ -110,7 +114,7 @@ std::wstring GetDllPath(void)
         std::wstring message = L"Failed to load AFV client, please load it manually\r\n\r\n";
         message += L"Failed to load codule handle. Code = " + code;
         MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
-        throw std::exception();
+        return L"";
     }
 
     if (GetModuleFileName(hm, path, sizeof(path)) == 0)
@@ -119,7 +123,7 @@ std::wstring GetDllPath(void)
         std::wstring message = L"Failed to load AFV client, please load it manually\r\n\r\n";
         message += L"Failed to get module path. Code = " + code;
         MessageBox(NULL, message.c_str(), L"AFV Bridge Bootstrap Error", MB_OK | MB_ICONERROR);
-        throw std::exception();
+        return L"";
     }
 
     return path;
