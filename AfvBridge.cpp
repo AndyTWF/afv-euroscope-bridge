@@ -86,42 +86,13 @@ bool AfvBridge::OnCompileCommand(const char* command)
 {
     std::string commandString(command);
 
-    // Receive light check
-    if (commandString == ".afv receive") {
-        this->isReceiving = !this->isReceiving;
-        return true;
-    }
-
-    // Transmit light check
-    if (commandString == ".afv transmit") {
-        this->isTransmitting = !this->isTransmitting;
-        return true;
-    }
-
-    // Last callsign transmitting check
-    if (commandString.substr(0, 10) == ".afv last ") {
-        this->lastTransmitted.clear();
-        std::string callsigns = commandString.substr(10);
-
-        size_t pos = 0;
-        while ((pos = callsigns.find(' ')) != std::string::npos) {
-            this->lastTransmitted.insert(callsigns.substr(0, pos));
-            callsigns.erase(0, pos + 1);
-        }
-
-        // Pick up the last one
-        this->lastTransmitted.insert(callsigns);
-        return true;
-    }
-
     // Message test
-    if (commandString != ".afv message") {
+    if (commandString.substr(0, 5)  != ".afv ") {
         return false;
     }
 
     // Create copy data
     std::string message = commandString.substr(5);
-    std::replace(message.begin(), message.end(), ' ', ':');
 
     COPYDATASTRUCT cds;
     cds.dwData = 666;
@@ -154,7 +125,38 @@ EuroScopePlugIn::CRadarScreen* AfvBridge::OnRadarScreenCreated(const char* sDisp
     return new AfvRadarScreen;
 }
 
-void AfvBridge::ProcessMessage(std::string message)
+void AfvBridge::ProcessTxMessage(std::string message)
+{
+    std::string setting = message.substr(3);
+    if (this->ValidBoolean(setting)) {
+        this->isTransmitting = this->ConvertBoolean(setting);
+    }
+}
+
+void AfvBridge::ProcessRxMessage(std::string message)
+{
+    std::string setting = message.substr(3);
+    if (this->ValidBoolean(setting)) {
+        this->isReceiving = this->ConvertBoolean(setting);
+    }
+}
+
+void AfvBridge::ProcessCallsignsMessage(std::string message)
+{
+    std::string callsigns = message.substr(10);
+    this->lastTransmitted.clear();
+
+    // Break up the callsigns
+    std::vector<std::string> parts;
+    std::stringstream ss(callsigns);
+    std::string temp;
+
+    while (std::getline(ss, temp, ',')) {
+        this->lastTransmitted.insert(temp);
+    }
+}
+
+void AfvBridge::ProcessFrequencyChangeMessage(std::string message)
 {
     std::vector<std::string> parts;
     std::stringstream ss(message);
@@ -184,14 +186,32 @@ void AfvBridge::ProcessMessage(std::string message)
     this->ToggleFrequency(std::stod(parts[0]), this->ConvertBoolean(parts[1]), this->ConvertBoolean(parts[2]));
 }
 
+void AfvBridge::ProcessMessage(std::string message)
+{
+    if (message.substr(0, 3) == "TX=") {
+        this->ProcessTxMessage(message);
+    }
+    else if (message.substr(0, 3) == "RX=") {
+        this->ProcessRxMessage(message);
+    }
+    else if (message.substr(0, 10) == "CALLSIGNS=") {
+        this->ProcessCallsignsMessage(message);
+    }
+    else {
+        this->ProcessFrequencyChangeMessage(message);
+    }
+}
+
 bool AfvBridge::ValidBoolean(std::string boolean) const
 {
-    return boolean == "True" || boolean == "False";
+    std::transform(boolean.begin(), boolean.end(), boolean.begin(), ::toupper);
+    return boolean == "TRUE" || boolean == "FALSE";
 }
 
 bool AfvBridge::ConvertBoolean(std::string boolean) const
 {
-    return boolean == "True";
+    std::transform(boolean.begin(), boolean.end(), boolean.begin(), ::toupper);
+    return boolean == "TRUE";
 }
 
 /*

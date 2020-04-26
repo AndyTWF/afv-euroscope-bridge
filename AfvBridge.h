@@ -25,6 +25,10 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
 
     private:
 
+        void ProcessTxMessage(std::string message);
+        void ProcessRxMessage(std::string message);
+        void ProcessCallsignsMessage(std::string message);
+        void ProcessFrequencyChangeMessage(std::string message);
         void ProcessMessage(std::string message);
         bool ValidBoolean(std::string boolean) const;
         bool ConvertBoolean(std::string boolean) const;
