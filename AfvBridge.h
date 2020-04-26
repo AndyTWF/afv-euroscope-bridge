@@ -27,6 +27,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
 
     private:
 
+        void LoginCheck(void);
         void ProcessTxMessage(std::string message);
         void ProcessRxMessage(std::string message);
         void ProcessCallsignsMessage(std::string message);
@@ -73,4 +74,5 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         bool vccsOpen = false;
         bool settingsOpen = false;
         std::set<std::string> lastTransmitted;
+        bool isLoggedIn = false;
 };

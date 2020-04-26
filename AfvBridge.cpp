@@ -70,6 +70,8 @@ AfvBridge::~AfvBridge(void)
 */
 void AfvBridge::OnTimer(int counter)
 {
+    this->LoginCheck();
+
     std::lock_guard<std::mutex> lock(this->messageLock);
 
     // Process any incoming messages from the standalone client
@@ -133,6 +135,38 @@ void AfvBridge::AddMessageToQueue(std::string message)
 EuroScopePlugIn::CRadarScreen* AfvBridge::OnRadarScreenCreated(const char* sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated)
 {
     return new AfvRadarScreen;
+}
+
+void AfvBridge::LoginCheck(void)
+{
+    if (!this->isLoggedIn && this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_NO) {
+        this->DisplayUserMessage(
+            "AFV_BRIDGE",
+            "AFV_BRIDGE",
+            "In",
+            true,
+            true,
+            true,
+            true,
+            true
+        );
+        SendApiMessage("FSD=TRUE", AFV_HIDDEN_WINDOW_CLASS);
+        this->isLoggedIn = true;
+    }
+    else if (this->isLoggedIn && this->GetConnectionType() == EuroScopePlugIn::CONNECTION_TYPE_NO) {
+        this->DisplayUserMessage(
+            "AFV_BRIDGE",
+            "AFV_BRIDGE",
+            "Out",
+            true,
+            true,
+            true,
+            true,
+            true
+        );
+        SendApiMessage("FSD=FALSE", AFV_HIDDEN_WINDOW_CLASS);
+        this->isLoggedIn = false;
+    }
 }
 
 void AfvBridge::ProcessTxMessage(std::string message)
