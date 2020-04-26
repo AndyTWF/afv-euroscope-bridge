@@ -95,37 +95,37 @@ void AfvRadarScreen::Move(int xPos, int yPos)
 
     this->settingsRect = {
         xPos + this->margin,
-        this->headerRect.bottom + this->txRxOffsetY,
+        this->headerRect.bottom + this->secondRowOffsetY,
         xPos + this->margin + this->buttonsWidth,
-        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
+        this->headerRect.bottom + this->secondRowOffsetY + this->secondRowHeight,
     };
 
     this->vccsRect = {
         this->settingsRect.right + this->buttonsGap,
-        this->headerRect.bottom + this->txRxOffsetY,
+        this->headerRect.bottom + this->secondRowOffsetY,
         this->settingsRect.right + this->buttonsGap + this->buttonsWidth,
-        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
+        this->headerRect.bottom + this->secondRowOffsetY + this->secondRowHeight,
     };
 
     this->txRect = {
         this->vccsRect.right + this->buttonsGap,
-        this->headerRect.bottom + this->txRxOffsetY,
+        this->headerRect.bottom + this->secondRowOffsetY,
         this->vccsRect.right + this->buttonsGap + this->txRxWidth,
-        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
+        this->headerRect.bottom + this->secondRowOffsetY + this->secondRowHeight,
     };
 
     this->rxRect = {
         this->txRect.right + this->buttonsGap,
-        this->headerRect.bottom + this->txRxOffsetY,
+        this->headerRect.bottom + this->secondRowOffsetY,
         this->txRect.right + this->buttonsGap + this->txRxWidth,
-        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
+        this->headerRect.bottom + this->secondRowOffsetY + this->secondRowHeight,
     };
 
     this->lastReceivedRect = {
         this->rxRect.right + this->buttonsGap,
-        this->headerRect.bottom + this->txRxOffsetY,
+        this->headerRect.bottom + this->secondRowOffsetY,
         this->rxRect.right + this->buttonsGap + this->callsignsWidth,
-        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight
+        this->headerRect.bottom + this->secondRowOffsetY + this->secondRowHeight
     };
 }
 

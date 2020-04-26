@@ -54,10 +54,10 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
 
         const int buttonsWidth = 30;
         const int txRxWidth = 20;
-        const int txRxHeight = 15;
+        const int secondRowHeight = 15;
         const int buttonsGap = 5;
         const int margin = 5;
-        const int txRxOffsetY = 5;
+        const int secondRowOffsetY = 5;
         const int headerHeight = 15;
 
         const int callsignsWidth = 220;
