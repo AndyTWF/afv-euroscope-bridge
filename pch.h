@@ -26,5 +26,6 @@
 #include <string>
 #include <algorithm>
 #include <iomanip>
+#include <TlHelp32.h>
 
 #endif //PCH_H

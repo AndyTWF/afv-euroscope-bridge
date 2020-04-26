@@ -1,6 +1,7 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
 #include "AfvBridge.h"
+#include "Api.h"
 
 AfvBridge bridge;
 
@@ -26,6 +27,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 */
 void __declspec(dllexport) EuroScopePlugInInit(EuroScopePlugIn::CPlugIn** ppPlugInInstance)
 {
+    // Start up AFV standalone
+    StartAfvClient();
+
     // Give ES the plugin instance and run the post initialisation method.
     *ppPlugInInstance = &bridge;
 }
