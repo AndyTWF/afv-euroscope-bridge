@@ -285,6 +285,9 @@ void AfvBridge::ProcessResetMessage(void)
     this->settingsOpen = false;
     this->vccsOpen = false;
     this->lastTransmitted = "";
+    this->isLoggedIn = false;
+    this->userFrequency = 199.998;
+    this->userCallsign = "";
 }
 
 /*
