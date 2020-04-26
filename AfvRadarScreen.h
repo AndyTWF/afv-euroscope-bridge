@@ -49,21 +49,19 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
 
         // Fixed coordinates
         const int startCoordinate = 100;
-        const int windowWidth = 105;
-        const int windowHeight = 155;
+        const int windowWidth = 350;
+        const int windowHeight = 40;
 
-        const int txRxWidth = 40;
+        const int buttonsWidth = 30;
+        const int txRxWidth = 20;
         const int txRxHeight = 15;
-        const int txRxGap = 15;
         const int buttonsGap = 5;
         const int margin = 5;
-        const int buttonsMargin = 10;
-        const int txRxOffsetY = 10;
+        const int txRxOffsetY = 5;
         const int headerHeight = 15;
 
-        const int lastReceivedHeaderOffset = 15;
-        const int lastReceivedHeight = 15;
-        const int lastReceivedDataOffset = 5;
+        const int callsignsWidth = 220;
+        const int callsignsHeight = 15;
 
         // Brushes
         HBRUSH backgroundBrush;

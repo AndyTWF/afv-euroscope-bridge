@@ -102,7 +102,7 @@ bool AfvBridge::IsSettingsOpen(void) const
     return this->settingsOpen;
 }
 
-const std::vector<std::string>& AfvBridge::GetLastTransmitted(void) const
+const std::string& AfvBridge::GetLastTransmitted(void) const
 {
     return this->lastTransmitted;
 }
@@ -220,17 +220,7 @@ void AfvBridge::ProcessRxMessage(std::string message)
 */
 void AfvBridge::ProcessCallsignsMessage(std::string message)
 {
-    std::string callsigns = message.substr(10);
-    this->lastTransmitted.clear();
-
-    // Break up the callsigns
-    std::vector<std::string> parts;
-    std::stringstream ss(callsigns);
-    std::string temp;
-
-    while (std::getline(ss, temp, ',')) {
-        this->lastTransmitted.push_back(temp);
-    }
+    this->lastTransmitted = message.substr(10);
 }
 
 /*

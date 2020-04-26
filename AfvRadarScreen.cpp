@@ -64,34 +64,11 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     FillRect(hdc, &this->rxRect, plugin->IsReceiving() ? this->txRxActiveBrush : this->txRxInactiveBrush);
     DrawText(hdc, L"RX", 2, &this->rxRect, DT_VCENTER | DT_CENTER);
 
-    // Last Received Header
-    DrawText(hdc, L"Last Receive:", 14, &this->lastReceivedRect, DT_VCENTER | DT_CENTER);
-
-    const std::vector<std::string>& lastReceived = plugin->GetLastTransmitted();
-    std::vector<std::string>::const_iterator iterator = lastReceived.cbegin();
+    // Last Received Callsign
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring last(L"Last: " + converter.from_bytes(plugin->GetLastTransmitted()));
 
-    // Last Received Callsign 1
-    if (iterator != lastReceived.cend()) {
-        std::wstring callsign = converter.from_bytes(*iterator);
-        DrawText(hdc, callsign.c_str(), callsign.size(), &this->lastReceivedCallsignOneRect, DT_VCENTER | DT_LEFT);
-        iterator++;
-    }
-
-    // Last Received Callsign 2
-    if (iterator != lastReceived.cend()) {
-        std::wstring callsign = converter.from_bytes(*iterator);
-        DrawText(hdc, callsign.c_str(), callsign.size(), &this->lastReceivedCallsignTwoRect, DT_VCENTER | DT_LEFT);
-        iterator++;
-    }
-
-    // Last Received Callsign 3
-    if (iterator != lastReceived.cend()) {
-        std::wstring callsign = converter.from_bytes(*iterator);
-        DrawText(hdc, callsign.c_str(), callsign.size(), &this->lastReceivedCallsignThreeRect, DT_VCENTER | DT_LEFT);
-        iterator++;
-    }
-
+    DrawText(hdc, last.c_str(), last.size() , &this->lastReceivedRect, DT_VCENTER | DT_LEFT);
 }
 
 bool AfvRadarScreen::IsInteger(std::string number) const
@@ -117,59 +94,38 @@ void AfvRadarScreen::Move(int xPos, int yPos)
     };
 
     this->settingsRect = {
-        xPos + this->buttonsMargin,
+        xPos + this->margin,
         this->headerRect.bottom + this->txRxOffsetY,
-        xPos + this->buttonsMargin + this->txRxWidth,
+        xPos + this->margin + this->buttonsWidth,
         this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->vccsRect = {
         this->settingsRect.right + this->buttonsGap,
         this->headerRect.bottom + this->txRxOffsetY,
-        this->settingsRect.right + this->buttonsGap + this->txRxWidth,
+        this->settingsRect.right + this->buttonsGap + this->buttonsWidth,
         this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->txRect = {
-        xPos + this->margin,
-        this->settingsRect.bottom + this->txRxOffsetY,
-        xPos + this->margin + this->txRxWidth,
-        this->settingsRect.bottom + this->txRxOffsetY + this->txRxHeight,
+        this->vccsRect.right + this->buttonsGap,
+        this->headerRect.bottom + this->txRxOffsetY,
+        this->vccsRect.right + this->buttonsGap + this->txRxWidth,
+        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->rxRect = {
-        this->txRect.right + this->txRxGap,
-        this->settingsRect.bottom + this->txRxOffsetY,
-        this->txRect.right + this->txRxGap + this->txRxWidth,
-        this->settingsRect.bottom + this->txRxOffsetY + this->txRxHeight,
+        this->txRect.right + this->buttonsGap,
+        this->headerRect.bottom + this->txRxOffsetY,
+        this->txRect.right + this->buttonsGap + this->txRxWidth,
+        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight,
     };
 
     this->lastReceivedRect = {
-        xPos + this->margin,
-        this->txRect.bottom + this->lastReceivedHeaderOffset,
-        this->rxRect.right,
-        this->txRect.bottom + this->lastReceivedHeaderOffset + this->lastReceivedHeight
-    };
-
-    this->lastReceivedCallsignOneRect = {
-        xPos + this->margin,
-        this->lastReceivedRect.bottom + this->lastReceivedDataOffset,
-        this->rxRect.right,
-        this->lastReceivedRect.bottom + this->lastReceivedDataOffset + this->lastReceivedHeight
-    };
-
-    this->lastReceivedCallsignTwoRect = {
-        xPos + this->margin,
-        this->lastReceivedCallsignOneRect.bottom + this->lastReceivedDataOffset,
-        this->rxRect.right,
-        this->lastReceivedCallsignOneRect.bottom + this->lastReceivedDataOffset + this->lastReceivedHeight
-    };
-
-    this->lastReceivedCallsignThreeRect = {
-        xPos + this->margin,
-        this->lastReceivedCallsignTwoRect.bottom + this->lastReceivedDataOffset,
-        this->rxRect.right,
-        this->lastReceivedCallsignTwoRect.bottom + this->lastReceivedDataOffset + this->lastReceivedHeight
+        this->rxRect.right + this->buttonsGap,
+        this->headerRect.bottom + this->txRxOffsetY,
+        this->rxRect.right + this->buttonsGap + this->callsignsWidth,
+        this->headerRect.bottom + this->txRxOffsetY + this->txRxHeight
     };
 }
 
