@@ -25,5 +25,6 @@
 #include <codecvt>
 #include <string>
 #include <algorithm>
+#include <iomanip>
 
 #endif //PCH_H

@@ -28,6 +28,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
     private:
 
         void LoginCheck(void);
+        void ControllerCheck(void);
         void ProcessTxMessage(std::string message);
         void ProcessRxMessage(std::string message);
         void ProcessCallsignsMessage(std::string message);
@@ -39,6 +40,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         bool ConvertBoolean(std::string boolean) const;
         void ToggleFrequency(double frequency, bool receive, bool transmit);
         bool IsFrequencyMatch(double targetFrequency, EuroScopePlugIn::CGrountToAirChannel channel);
+        bool IsFrequencyMatch(double targetFrequency, double matchFrequency);
         bool IsAtisChannel(std::string channel) const;
         EuroScopePlugIn::CGrountToAirChannel GetPrimaryFrequency(void);
 
@@ -74,5 +76,10 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         bool vccsOpen = false;
         bool settingsOpen = false;
         std::set<std::string> lastTransmitted;
+        
+        // ES status
         bool isLoggedIn = false;
+        std::string userCallsign = "";
+        double userFrequency = 199.998;
+
 };
