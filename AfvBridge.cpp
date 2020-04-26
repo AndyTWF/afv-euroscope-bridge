@@ -133,8 +133,13 @@ void AfvBridge::AddMessageToQueue(std::string message)
     this->messages.push(message);
 }
 
-EuroScopePlugIn::CRadarScreen* AfvBridge::OnRadarScreenCreated(const char* sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated)
-{
+EuroScopePlugIn::CRadarScreen* AfvBridge::OnRadarScreenCreated(
+    const char* sDisplayName,
+    bool NeedRadarContent,
+    bool GeoReferenced,
+    bool CanBeSaved,
+    bool CanBeCreated
+) {
     return new AfvRadarScreen;
 }
 
