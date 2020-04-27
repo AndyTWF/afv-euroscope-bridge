@@ -47,10 +47,10 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
 
         // Fixed coordinates
         const int startCoordinate = 100;
-        const int windowWidth = 350;
+        const int windowWidth = 360;
         const int windowHeight = 40;
 
-        const int buttonsWidth = 30;
+        const int buttonsWidth = 35;
         const int txRxWidth = 20;
         const int secondRowHeight = 15;
         const int buttonsGap = 5;

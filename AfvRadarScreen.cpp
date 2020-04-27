@@ -57,7 +57,7 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
 
     // VCCS Button
     FrameRect(hdc, &this->vccsRect, plugin->IsVccsOpen() ? this->txRxActiveBrush : this->buttonOutlineBrush);
-    DrawText(hdc, L"COMM", 4, &this->vccsRect, DT_VCENTER | DT_CENTER);
+    DrawText(hdc, L"COMMS", 5, &this->vccsRect, DT_VCENTER | DT_CENTER);
     this->AddScreenObject(1, "vccsButton", this->vccsRect, true, "");
 
     // TX
