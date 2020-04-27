@@ -319,7 +319,7 @@ void AfvBridge::ProcessMessage(std::string message)
     else if (message.substr(0, 7) == "STATUS=") {
         this->ProcessAfvStatusMessage(message);
     }
-    else if (message == "RESET") {
+    else if (message == "RESET" || message == "CLOSING") {
         this->ProcessResetMessage();
     }  else {
         this->ProcessFrequencyChangeMessage(message);
