@@ -29,6 +29,7 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
 
     private:
 
+        HBRUSH& GetStatusColourForHeader(int status);
         bool IsInteger(std::string number) const;
         void Move(int xPos, int yPos);
 
@@ -64,7 +65,9 @@ class AfvRadarScreen : public EuroScopePlugIn::CRadarScreen
         HBRUSH backgroundBrush;
         HBRUSH txRxActiveBrush;
         HBRUSH txRxInactiveBrush;
-        HBRUSH headerBrush;
+        HBRUSH headerBrushDisconnected;
+        HBRUSH headerBrushConnecting;
+        HBRUSH headerBrushConnected;
         HBRUSH buttonOutlineBrush;
 
         // ASR settings

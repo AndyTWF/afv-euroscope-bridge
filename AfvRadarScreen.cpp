@@ -11,7 +11,9 @@ AfvRadarScreen::AfvRadarScreen()
     this->backgroundBrush = CreateSolidBrush(RGB(32, 32, 32));
     this->txRxActiveBrush = CreateSolidBrush(RGB(234, 173, 92));
     this->txRxInactiveBrush = CreateSolidBrush(RGB(0, 0, 0));
-    this->headerBrush = CreateSolidBrush(RGB(128, 128, 128));
+    this->headerBrushDisconnected = CreateSolidBrush(RGB(255, 97, 93));
+    this->headerBrushConnecting = CreateSolidBrush(RGB(253, 173, 92));
+    this->headerBrushConnected = CreateSolidBrush(RGB(13, 134, 93));
     this->buttonOutlineBrush = CreateSolidBrush(RGB(102, 102, 102));
 }
 
@@ -21,7 +23,9 @@ AfvRadarScreen::~AfvRadarScreen()
     DeleteObject(this->backgroundBrush);
     DeleteObject(this->txRxActiveBrush);
     DeleteObject(this->txRxInactiveBrush);
-    DeleteObject(this->headerBrush);
+    DeleteObject(this->headerBrushDisconnected);
+    DeleteObject(this->headerBrushConnecting);
+    DeleteObject(this->headerBrushConnected);
     DeleteObject(this->buttonOutlineBrush);
 }
 
@@ -43,7 +47,7 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     this->AddScreenObject(1, "afvWindow", this->windowRect, true, "");
 
     // Header Bar
-    FillRect(hdc, &this->headerRect, this->headerBrush);
+    FillRect(hdc, &this->headerRect, this->GetStatusColourForHeader(plugin->GetAfvConnectionStatus()));
     DrawText(hdc, L"AFV", 3, &this->headerRect, DT_VCENTER | DT_CENTER);
 
     // Settings Button
@@ -69,6 +73,18 @@ void AfvRadarScreen::OnRefresh(HDC hdc, int phase)
     std::wstring last(L"Last: " + converter.from_bytes(plugin->GetLastTransmitted()));
 
     DrawText(hdc, last.c_str(), last.size() , &this->lastReceivedRect, DT_VCENTER | DT_LEFT);
+}
+
+HBRUSH& AfvRadarScreen::GetStatusColourForHeader(int status)
+{
+    switch (status) {
+        case AfvBridge::AFV_STATUS_CONNECTED:
+            return this->headerBrushConnected;
+        case AfvBridge::AFV_STATUS_CONNECTING:
+            return this->headerBrushConnecting;
+        default:
+            return this->headerBrushDisconnected;
+    }
 }
 
 bool AfvRadarScreen::IsInteger(std::string number) const
