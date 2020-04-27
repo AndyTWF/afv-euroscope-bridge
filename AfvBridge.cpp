@@ -102,6 +102,11 @@ bool AfvBridge::IsSettingsOpen(void) const
     return this->settingsOpen;
 }
 
+int AfvBridge::GetAfvConnectionStatus(void) const
+{
+    return this->afvConnectionStatus;
+}
+
 const std::string& AfvBridge::GetLastTransmitted(void) const
 {
     return this->lastTransmitted;
@@ -288,6 +293,7 @@ void AfvBridge::ProcessResetMessage(void)
     this->isLoggedIn = false;
     this->userFrequency = 199.998;
     this->userCallsign = "";
+    this->afvConnectionStatus = this->AFV_STATUS_DISCONNECTED;
 }
 
 /*
@@ -310,11 +316,25 @@ void AfvBridge::ProcessMessage(std::string message)
     else if (message.substr(0, 9) == "SETTINGS=") {
         this->ProcessSettingsMessage(message);
     }
+    else if (message.substr(0, 7) == "STATUS=") {
+        this->ProcessAfvStatusMessage(message);
+    }
     else if (message == "RESET") {
         this->ProcessResetMessage();
-    }
-    else {
+    }  else {
         this->ProcessFrequencyChangeMessage(message);
+    }
+}
+
+void AfvBridge::ProcessAfvStatusMessage(std::string message)
+{
+    std::string status = message.substr(7);
+    if (status == "CONNECTED") {
+        this->afvConnectionStatus = this->AFV_STATUS_CONNECTED;
+    } else if (status == "CONNECTING") {
+        this->afvConnectionStatus = this->AFV_STATUS_CONNECTING;
+    } else if (status == "DISCONNECTED") {
+        this->afvConnectionStatus = this->AFV_STATUS_DISCONNECTED;
     }
 }
 

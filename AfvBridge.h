@@ -19,7 +19,12 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         bool IsReceiving(void) const;
         bool IsVccsOpen(void) const;
         bool IsSettingsOpen(void) const;
+        int GetAfvConnectionStatus(void) const;
         const std::string& GetLastTransmitted(void) const;
+
+        const static int AFV_STATUS_DISCONNECTED = 1;
+        const static int AFV_STATUS_CONNECTING = 2;
+        const static int AFV_STATUS_CONNECTED = 3;
 
 #ifdef _DEBUG
         bool OnCompileCommand(const char* command);
@@ -37,6 +42,7 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         void ProcessVCCSMessage(std::string message);
         void ProcessResetMessage(void);
         void ProcessMessage(std::string message);
+        void ProcessAfvStatusMessage(std::string message);
         bool ValidBoolean(std::string boolean) const;
         bool ConvertBoolean(std::string boolean) const;
         void ToggleFrequency(double frequency, bool receive, bool transmit);
@@ -74,9 +80,13 @@ class AfvBridge : public EuroScopePlugIn::CPlugIn
         // Transmitting and Receiving
         bool isTransmitting = false;
         bool isReceiving = false;
+        std::string lastTransmitted;
+
+
+        // AFV Status
+        int afvConnectionStatus = AfvBridge::AFV_STATUS_DISCONNECTED;
         bool vccsOpen = false;
         bool settingsOpen = false;
-        std::string lastTransmitted;
         
         // ES status
         bool isLoggedIn = false;
