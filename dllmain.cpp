@@ -40,5 +40,6 @@ void __declspec(dllexport) EuroScopePlugInInit(EuroScopePlugIn::CPlugIn** ppPlug
 */
 void __declspec(dllexport) EuroScopePlugInExit(void)
 {
-
+    // Tell AFV we're shutting down
+    SendAfvClientMessage("CLOSING");
 }
