@@ -156,8 +156,8 @@ void AfvBridge::LoginCheck(void)
 {
     if (
         !this->isLoggedIn &&
-        this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_NO &&
-        this->GetConnectionType() != EuroScopePlugIn::CONNECTION_TYPE_VIA_PROXY
+        this->GetConnectionType() == EuroScopePlugIn::CONNECTION_TYPE_DIRECT
+     
     ) {
         SendAfvClientMessage("FSD=TRUE");
         this->isLoggedIn = true;
