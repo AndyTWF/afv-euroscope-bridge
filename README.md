@@ -42,3 +42,11 @@ Where:
 - FREQ is a 6 digit frequency
 - RCV is a boolean (true or false) for whether text receive should be turned on.
 - XMT is a boolean (true or false) for whether text transmit should be turned on.
+
+## TX/RX/Last Callsign Display
+
+The plugin can display the current status of the AFV Standalone Client - whether the user is receiving a transmission, the callsign of the transmitter(s) and whether the user is transmitting themselves.
+
+## Settings and VCCS Buttons
+
+The plugin can toggle the VCCS and Settings menu's of the AFV Standalone Client.

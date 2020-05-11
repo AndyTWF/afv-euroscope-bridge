@@ -168,7 +168,10 @@
   <ItemGroup>
     <ClInclude Include="afv-euroscope-bridge.h" />
     <ClInclude Include="AfvBridge.h" />
+    <ClInclude Include="AfvRadarScreen.h" />
+    <ClInclude Include="Api.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="Conversions.h" />
     <ClInclude Include="EuroScopePlugIn.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HiddenWindow.h" />
@@ -177,6 +180,8 @@
   <ItemGroup>
     <ClCompile Include="afv-euroscope-bridge.cpp" />
     <ClCompile Include="AfvBridge.cpp" />
+    <ClCompile Include="AfvRadarScreen.cpp" />
+    <ClCompile Include="Api.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="HiddenWindow.cpp" />
     <ClCompile Include="pch.cpp">

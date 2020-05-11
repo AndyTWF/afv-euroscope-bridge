@@ -19,5 +19,13 @@
 #include <Windows.h>
 #include <regex>
 #include <functional>
+#include <wtypes.h>
+#include <set>
+#include <locale>
+#include <codecvt>
+#include <string>
+#include <algorithm>
+#include <iomanip>
+#include <TlHelp32.h>
 
 #endif //PCH_H

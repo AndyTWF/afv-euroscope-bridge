@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "AfvBridge.h"
+#include "AfvRadarScreen.h"
 #include "HiddenWindow.h"
+#include "Api.h"
 
 
 AfvBridge::AfvBridge(void)
@@ -12,7 +14,19 @@ AfvBridge::AfvBridge(void)
         PLUGIN_COPYRIGHT
     )
 {
-    RegisterClass(&this->windowClass);
+    if (!RegisterClass(&this->windowClass)) {
+        this->DisplayUserMessage(
+            "AFV_BRIDGE",
+            "AFV_BRIDGE",
+            "Unable to register window class for AFV Bridge",
+            true,
+            true,
+            true,
+            true,
+            true
+        );
+        return;
+    }
 
     this->hiddenWindow = CreateWindow(
         L"AfvBridgeHiddenWindowClass",
@@ -47,6 +61,8 @@ AfvBridge::~AfvBridge(void)
     if (this->hiddenWindow != NULL) {
         DestroyWindow(this->hiddenWindow);
     }
+
+    UnregisterClass(this->windowClass.lpszClassName, GetModuleHandle(NULL));
 }
 
 /*
@@ -54,6 +70,9 @@ AfvBridge::~AfvBridge(void)
 */
 void AfvBridge::OnTimer(int counter)
 {
+    this->LoginCheck();
+    this->ControllerCheck();
+
     std::lock_guard<std::mutex> lock(this->messageLock);
 
     // Process any incoming messages from the standalone client
@@ -63,33 +82,49 @@ void AfvBridge::OnTimer(int counter)
     }
 }
 
+bool AfvBridge::IsTransmitting(void) const
+{
+    return this->isTransmitting;
+}
+
+bool AfvBridge::IsReceiving(void) const
+{
+    return this->isReceiving;
+}
+
+bool AfvBridge::IsVccsOpen(void) const
+{
+    return this->vccsOpen;
+}
+
+bool AfvBridge::IsSettingsOpen(void) const
+{
+    return this->settingsOpen;
+}
+
+int AfvBridge::GetAfvConnectionStatus(void) const
+{
+    return this->afvConnectionStatus;
+}
+
+const std::string& AfvBridge::GetLastTransmitted(void) const
+{
+    return this->lastTransmitted;
+}
+
 #ifdef _DEBUG
 bool AfvBridge::OnCompileCommand(const char* command)
 {
     std::string commandString(command);
 
-    // Check message
-    if (commandString.substr(0, 5) != ".afv ") {
+    // Message test
+    if (commandString.substr(0, 5)  != ".afv ") {
         return false;
     }
 
     // Create copy data
     std::string message = commandString.substr(5);
-    std::replace(message.begin(), message.end(), ' ', ':');
-
-    COPYDATASTRUCT cds;
-    cds.dwData = 666;
-    cds.cbData = message.size() + 1;
-    cds.lpData = (PVOID) message.c_str();
-
-    // Find the hidden window
-    HWND window = FindWindowEx(NULL, NULL, this->windowClass.lpszClassName, NULL);
-    if (window == NULL) {
-        return true;
-    }
-
-    // Send the data
-    SendMessage(window, WM_COPYDATA, reinterpret_cast<WPARAM>(window), reinterpret_cast<LPARAM>(&cds));
+    SendSelfMessage(message);
     return true;
 }
 #endif // _DEBUG
@@ -103,7 +138,100 @@ void AfvBridge::AddMessageToQueue(std::string message)
     this->messages.push(message);
 }
 
-void AfvBridge::ProcessMessage(std::string message)
+EuroScopePlugIn::CRadarScreen* AfvBridge::OnRadarScreenCreated(
+    const char* sDisplayName,
+    bool NeedRadarContent,
+    bool GeoReferenced,
+    bool CanBeSaved,
+    bool CanBeCreated
+) {
+    return new AfvRadarScreen;
+}
+
+/*
+    If logged in freshly, send a FSD login message.
+    If logged out, send a FSD logout message and reset the users frequency and callsign.
+*/
+void AfvBridge::LoginCheck(void)
+{
+    if (
+        !this->isLoggedIn &&
+        this->GetConnectionType() == EuroScopePlugIn::CONNECTION_TYPE_DIRECT
+     
+    ) {
+        SendAfvClientMessage("FSD=TRUE");
+        this->isLoggedIn = true;
+    }
+    else if (this->isLoggedIn && this->GetConnectionType() == EuroScopePlugIn::CONNECTION_TYPE_NO) {
+        SendAfvClientMessage("FSD=FALSE");
+        this->isLoggedIn = false;
+        this->userFrequency = 199.998;
+        this->userCallsign = "";
+    }
+}
+
+/*
+    Check for callsign and primary frequency changes and send appropriate messages - only
+    if logged in.
+*/
+void AfvBridge::ControllerCheck(void)
+{
+    EuroScopePlugIn::CController me = this->ControllerMyself();
+
+    if (!me.IsValid() || !this->isLoggedIn) {
+        return;
+    }
+
+    // Check callsign
+    if (me.GetCallsign() != this->userCallsign) {
+        this->userCallsign = me.GetCallsign();
+        SendAfvClientMessage("CONTROLLER=" + std::string(me.GetCallsign()));
+    }
+
+    // Check primary frequency
+    if (!this->IsFrequencyMatch(this->userFrequency, me.GetPrimaryFrequency())) {
+        this->userFrequency = me.GetPrimaryFrequency();
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(3) << me.GetPrimaryFrequency();
+
+        SendAfvClientMessage("PRIM=" + stream.str());
+    }
+}
+
+/*
+    Process Transmit messages to determine if we're transmitting
+*/
+void AfvBridge::ProcessTxMessage(std::string message)
+{
+    std::string setting = message.substr(3);
+    if (this->ValidBoolean(setting)) {
+        this->isTransmitting = this->ConvertBoolean(setting);
+    }
+}
+
+/*
+    Process Transmit messages to determine if we're receiving
+*/
+void AfvBridge::ProcessRxMessage(std::string message)
+{
+    std::string setting = message.substr(3);
+    if (this->ValidBoolean(setting)) {
+        this->isReceiving = this->ConvertBoolean(setting);
+    }
+}
+
+/*
+    Process Callsign messages to get who last transmitted
+*/
+void AfvBridge::ProcessCallsignsMessage(std::string message)
+{
+    this->lastTransmitted = message.substr(10);
+}
+
+/*
+    Process messages to do with frequency changes in the AFV client itself
+*/
+void AfvBridge::ProcessFrequencyChangeMessage(std::string message)
 {
     std::vector<std::string> parts;
     std::stringstream ss(message);
@@ -133,14 +261,93 @@ void AfvBridge::ProcessMessage(std::string message)
     this->ToggleFrequency(std::stod(parts[0]), this->ConvertBoolean(parts[1]), this->ConvertBoolean(parts[2]));
 }
 
+/*
+    Process messages to do with the settings dialog being closed.
+*/
+void AfvBridge::ProcessSettingsMessage(std::string message)
+{
+    std::string setting = message.substr(9);
+    if (this->ValidBoolean(setting)) {
+        this->settingsOpen = this->ConvertBoolean(setting);
+    }
+}
+
+/*
+    Process messages to do with the VCCS dialog being closed.
+*/
+void AfvBridge::ProcessVCCSMessage(std::string message)
+{
+    std::string setting = message.substr(5);
+    if (this->ValidBoolean(setting)) {
+        this->vccsOpen = this->ConvertBoolean(setting);
+    }
+}
+
+void AfvBridge::ProcessResetMessage(void)
+{
+    this->isTransmitting = false;
+    this->isReceiving = false;
+    this->settingsOpen = false;
+    this->vccsOpen = false;
+    this->lastTransmitted = "";
+    this->isLoggedIn = false;
+    this->userFrequency = 199.998;
+    this->userCallsign = "";
+    this->afvConnectionStatus = this->AFV_STATUS_DISCONNECTED;
+}
+
+/*
+    Check the message type and delegate it to another method
+*/
+void AfvBridge::ProcessMessage(std::string message)
+{
+    if (message.substr(0, 3) == "TX=") {
+        this->ProcessTxMessage(message);
+    }
+    else if (message.substr(0, 3) == "RX=") {
+        this->ProcessRxMessage(message);
+    }
+    else if (message.substr(0, 10) == "CALLSIGNS=") {
+        this->ProcessCallsignsMessage(message);
+    }
+    else if (message.substr(0, 5) == "VCCS=") {
+        this->ProcessVCCSMessage(message);
+    }
+    else if (message.substr(0, 9) == "SETTINGS=") {
+        this->ProcessSettingsMessage(message);
+    }
+    else if (message.substr(0, 7) == "STATUS=") {
+        this->ProcessAfvStatusMessage(message);
+    }
+    else if (message == "RESET") {
+        this->ProcessResetMessage();
+    }  else {
+        this->ProcessFrequencyChangeMessage(message);
+    }
+}
+
+void AfvBridge::ProcessAfvStatusMessage(std::string message)
+{
+    std::string status = message.substr(7);
+    if (status == "CONNECTED") {
+        this->afvConnectionStatus = this->AFV_STATUS_CONNECTED;
+    } else if (status == "CONNECTING") {
+        this->afvConnectionStatus = this->AFV_STATUS_CONNECTING;
+    } else if (status == "DISCONNECTED") {
+        this->afvConnectionStatus = this->AFV_STATUS_DISCONNECTED;
+    }
+}
+
 bool AfvBridge::ValidBoolean(std::string boolean) const
 {
-    return boolean == "True" || boolean == "False";
+    std::transform(boolean.begin(), boolean.end(), boolean.begin(), ::toupper);
+    return boolean == "TRUE" || boolean == "FALSE";
 }
 
 bool AfvBridge::ConvertBoolean(std::string boolean) const
 {
-    return boolean == "True";
+    std::transform(boolean.begin(), boolean.end(), boolean.begin(), ::toupper);
+    return boolean == "TRUE";
 }
 
 /*
@@ -186,6 +393,15 @@ void AfvBridge::ToggleFrequency(double frequency, bool receive, bool transmit)
 bool AfvBridge::IsFrequencyMatch(double targetFrequency, EuroScopePlugIn::CGrountToAirChannel channel)
 {
     return std::abs(channel.GetFrequency() - targetFrequency) < this->frequencyDeviation;
+}
+
+/*
+    Returns true if the given channel has a frequency within a reasonable deviation
+    of the target frequency.
+*/
+bool AfvBridge::IsFrequencyMatch(double targetFrequency, double matchFrequency)
+{
+    return std::abs(matchFrequency - targetFrequency) < this->frequencyDeviation;
 }
 
 /*
